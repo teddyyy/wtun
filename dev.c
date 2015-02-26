@@ -200,13 +200,9 @@ void transmit_beacon(void *p, u8* mac,
 		pr_info("%s: true\n", __func__);
 		skb = ieee80211_beacon_get(hw, vif);
 
-		if (skb == NULL)
-			pr_info("%s: skb is null\n", __func__);
-
-		if (NULL != skb) {
-				pr_info("transmit beacon by tunnel\n");
+		if (NULL != skb) 
 				send_by_tunnel(skb);
-		}
+		
 		whw->ubeacons_count++;
 		dev_kfree_skb(skb);
 	}
@@ -219,8 +215,6 @@ static int transmit_thread(void *p)
 	unsigned long ctime;
 	int var = 3;
 
-	pr_info("%s\n", __func__);
-
 	set_user_nice(current, -20);
 
 	ctime = jiffies + phw->ubeacons;
@@ -229,7 +223,6 @@ static int transmit_thread(void *p)
 		wait_event_interruptible(phw->plist, var != 0);
 		if (true == phw->active) {
 			if (jiffies > ctime) {
-				pr_info("iterate_active_interfaces\n");
 				ieee80211_iterate_active_interfaces_atomic(phw->hw,
 									   transmit_beacon,
 									   phw->hw);
@@ -253,8 +246,7 @@ static void transmit_wtun_dev(struct ieee80211_hw *phw,
 				struct sk_buff *skb)
 {
 	struct wtun_hw *hw = (struct wtun_hw *)phw->priv;
-
-	pr_info("%s\n", __func__);
+	struct ieee80211_tx_info *tx_info = NULL;
 
 	if ((hw != NULL) && (skb != NULL)) {
  		struct ieee80211_hdr *ieh = (struct ieee80211_hdr *)skb->data;
@@ -263,10 +255,21 @@ static void transmit_wtun_dev(struct ieee80211_hw *phw,
 				dev_kfree_skb(skb);
 				pr_info("dev_kfree_skb\n");
 			}
-			else {
+			else 
 				send_by_tunnel(skb);
-			}
+			
 		}
+		skb_orphan(skb);
+		skb_dst_drop(skb);
+		skb->mark = 0;
+		secpath_reset(skb);
+		nf_reset(skb);
+
+		tx_info = IEEE80211_SKB_CB(skb);
+		ieee80211_tx_info_clear_status(tx_info);
+		if (0 == (tx_info->flags & IEEE80211_TX_CTL_NO_ACK))
+			tx_info->flags |= IEEE80211_TX_STAT_ACK;
+		ieee80211_tx_status_irqsafe(hw->hw, skb);
 	}
 		
 }

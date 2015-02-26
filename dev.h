@@ -1,5 +1,6 @@
 #include <net/mac80211.h>
 #include <net/cfg80211.h>
+#include <net/xfrm.h>
 #include <linux/etherdevice.h>
 #include <linux/device.h>
 #include <linux/kthread.h>
