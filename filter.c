@@ -53,7 +53,8 @@ static unsigned int wtun_hook_funk(unsigned int hooknum,
 
 		skb_pull(skb, rest_wtun_header_len);
 
-		ieee80211_rx_irqsafe(whw->hw, skb);
+		if (skb == NULL)
+			ieee80211_rx_irqsafe(whw->hw, skb);
 		
 		return NF_STOLEN;
 
