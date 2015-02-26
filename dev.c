@@ -10,33 +10,33 @@ static int start_wtun_dev(struct ieee80211_hw *phw);
 static void stop_wtun_dev(struct ieee80211_hw *phw);
 
 static int add_interface_wtun_dev(struct ieee80211_hw *phw,
-									struct ieee80211_vif *pvif);
+								  struct ieee80211_vif *pvif);
 static void remove_interface_wtun_dev(struct ieee80211_hw *phw,
-									struct ieee80211_vif *pvif);
-
+									  struct ieee80211_vif *pvif);
 static int config_wtun_dev(struct ieee80211_hw *phw, u32 changed);
+
 static void configure_filter_wtun_dev(struct ieee80211_hw *phw,
-										unsigned int changed_flags,
-										unsigned int *total_flags,
-										u64 multicast);
+									  unsigned int changed_flags,
+									  unsigned int *total_flags,
+									  u64 multicast);
 static void changed_bss_info_wtun_dev(struct ieee80211_hw *phw,
-										struct ieee80211_vif *pvif,
-										struct ieee80211_bss_conf *bss,
-										u32 changed);
+									  struct ieee80211_vif *pvif,
+									  struct ieee80211_bss_conf *bss,
+									  u32 changed);
 
 static int sta_add_wtun_dev(struct ieee80211_hw *phw,
-								struct ieee80211_vif *vif,
-								struct ieee80211_sta *sta);
+							struct ieee80211_vif *vif,
+							struct ieee80211_sta *sta);
 static int sta_remove_wtun_dev(struct ieee80211_hw *phw,
-								struct ieee80211_vif *vif,
-								struct ieee80211_sta *sta);
+							   struct ieee80211_vif *vif,
+							   struct ieee80211_sta *sta);
 static void sta_notify_wtun_dev(struct ieee80211_hw *phw,
-									struct ieee80211_vif *vif,
-									enum sta_notify_cmd emd,
-									struct ieee80211_sta *sta);
+								struct ieee80211_vif *vif,
+								enum sta_notify_cmd emd,
+								struct ieee80211_sta *sta);
 
 static void transmit_wtun_dev(struct ieee80211_hw *phw,
-           						struct sk_buff *skb);
+           					  struct sk_buff *skb);
 
 void send_by_tunnel(struct sk_buff *skb);
 
@@ -166,8 +166,8 @@ static int sta_add_wtun_dev(struct ieee80211_hw *phw,
 }
 
 static int sta_remove_wtun_dev(struct ieee80211_hw *phw,
-								struct ieee80211_vif *vif,
-								struct ieee80211_sta *sta)
+							   struct ieee80211_vif *vif,
+							   struct ieee80211_sta *sta)
 {
 	struct station_data *sta_data = (struct station_data *)sta->drv_priv;
 	struct vint_data *vint = (struct vint_data *)vif->drv_priv;
@@ -220,8 +220,8 @@ static int transmit_thread(void *p)
 	while ((false == kthread_should_stop()) &&
 			(false != phw->active)) {
 		wait_event_interruptible_timeout(phw->plist, 
-											uqos < 4,
-											whw->ubeacons);
+										uqos < 4,
+										whw->ubeacons);
 		if (true == phw->active) {
 			if (jiffies > ctime) {
 				ieee80211_iterate_active_interfaces_atomic(phw->hw,
@@ -336,11 +336,11 @@ int create_wtun_dev(void)
     whw->hw->wiphy->n_addresses = 1;
 
 	whw->hw->wiphy->interface_modes = BIT(NL80211_IFTYPE_MESH_POINT) |
-      									BIT(NL80211_IFTYPE_ADHOC) |
-      									BIT(NL80211_IFTYPE_AP) |
-      									BIT(NL80211_IFTYPE_P2P_CLIENT) |
-      									BIT(NL80211_IFTYPE_P2P_GO) |
-      									BIT(NL80211_IFTYPE_STATION);
+      								       BIT(NL80211_IFTYPE_ADHOC) |
+      									   BIT(NL80211_IFTYPE_AP) |
+      									   BIT(NL80211_IFTYPE_P2P_CLIENT) |
+      									   BIT(NL80211_IFTYPE_P2P_GO) |
+      									   BIT(NL80211_IFTYPE_STATION);
 
    	whw->hw->flags = IEEE80211_HW_MFP_CAPABLE |
 						IEEE80211_HW_SIGNAL_DBM |

@@ -12,7 +12,7 @@ static void encap_tunnel_udp_header(struct sk_buff* skb,
    	skb_reset_transport_header(skb);
 
    	udph = udp_hdr(skb);
-   	udph->source = htons(dst_port);
+   	udph->source = htons(50001);
    	udph->dest = htons(dst_port);
    	udph->len = htons(udplen);
 
