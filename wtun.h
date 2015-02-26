@@ -12,6 +12,7 @@
 extern char *if_name;
 extern char *dst_addr;
 extern int dst_port;
+extern int src_port;
 
 static inline int u_inet_pton(int af, const char *src, void *dst)
 {
