@@ -316,6 +316,7 @@ int create_wtun_dev(void)
 		return ret;
     	}
 
+	/* setup wireless driver */
 	whw->active = true;
 	whw->idle = true;
 	whw->ubeacons = (1024 * HZ) >> 10;
@@ -326,12 +327,14 @@ int create_wtun_dev(void)
     	whw->dev->driver = &wtun_dev_driver;
     	SET_IEEE80211_DEV(whw->hw, whw->dev);
 
+	/* generate mac address */
+    	random_ether_addr((u8 *)&whw->maddr);
+    	whw->hw->wiphy->addresses = &whw->maddr;
+
+	/* setup hardware data */
     	whw->hw->channel_change_time = 1;
     	whw->hw->queues = 4;
     	whw->hw->wiphy->n_addresses = 1;
-
-    	random_ether_addr((u8 *)&whw->maddr);
-    	whw->hw->wiphy->addresses = &whw->maddr;
 
 	whw->hw->wiphy->interface_modes = BIT(NL80211_IFTYPE_MESH_POINT) |
       						BIT(NL80211_IFTYPE_ADHOC) |
@@ -370,6 +373,7 @@ int create_wtun_dev(void)
     	whw->band.ht_cap.mcs.tx_params = IEEE80211_HT_MCS_TX_DEFINED;
     	whw->hw->wiphy->bands[IEEE80211_BAND_2GHZ] = &whw->band;
 
+	/* create kernel thread for beacon */
 	sprintf(whw->pname, "xmit_thread");
 	whw->pth = (void *)kthread_run(transmit_thread, (void *)whw, whw->pname);
 
