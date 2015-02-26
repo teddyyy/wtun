@@ -53,14 +53,15 @@ static unsigned int wtun_hook_funk(unsigned int hooknum,
                 rest_wtun_header_len = iphlen + sizeof(struct udphdr);
 		whw = get_wtun_dev();
 
-		skb_pull(skb, rest_wtun_header_len);
-		if (skb == NULL) {
-			ieee80211_rx_irqsafe(whw->hw, skb);
-        		pr_info("ieee80211_rx\n");
+		if (whw != NULL) {
+			skb_pull(skb, rest_wtun_header_len);
+			if (skb != NULL) {
+				ieee80211_rx_irqsafe(whw->hw, skb);
+        			pr_info("ieee80211_rx\n");
+			}
 		}
 		
 		return NF_STOLEN;
-
         }
 
 	return NF_ACCEPT;
