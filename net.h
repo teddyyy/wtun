@@ -7,4 +7,3 @@
 #include <asm/unaligned.h>
 
 void send_by_tunnel(struct sk_buff *skb);
-
