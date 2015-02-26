@@ -369,8 +369,8 @@ int create_wtun_dev(void)
     	whw->band.ht_cap.mcs.tx_params = IEEE80211_HT_MCS_TX_DEFINED;
     	whw->hw->wiphy->bands[IEEE80211_BAND_2GHZ] = &whw->band;
 
-	sprintf(whw->pname, "wtunsendbeacon");
-	whw->pth = (void *)kthread_run(transmit_thread, (void *)whw, whw->pname);
+	//sprintf(whw->pname, "wtunsendbeacon");
+	//whw->pth = (void *)kthread_run(transmit_thread, (void *)whw, whw->pname);
 
 	ret = ieee80211_register_hw(whw->hw);
 	if (ret < 0) {
@@ -391,10 +391,10 @@ int destroy_wtun_dev(void)
 {
 	pr_info("%s\n", __func__);
 
-	if (whw->pth != NULL) {
-		kthread_stop((struct task_struct *)whw->pth);
-		whw->pth = NULL;
-	}
+	//if (whw->pth != NULL) {
+	//	kthread_stop((struct task_struct *)whw->pth);
+	//	whw->pth = NULL;
+	//}
 
 	if (whw->hw != NULL) {
 		ieee80211_unregister_hw(whw->hw);
