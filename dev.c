@@ -376,6 +376,7 @@ int create_wtun_dev(void)
 	if (ret < 0) {
 		device_unregister(whw->dev);
 		ieee80211_free_hw(whw->hw);
+		whw = NULL;
 	}
 
 	return 0;
@@ -395,10 +396,13 @@ int destroy_wtun_dev(void)
 		whw->pth = NULL;
 	}
 
-	ieee80211_unregister_hw(whw->hw);
-	device_unregister(whw->dev);
-	class_destroy(whw->class);
-	ieee80211_free_hw(whw->hw);
+	if (whw->hw != NULL) {
+		ieee80211_unregister_hw(whw->hw);
+		if (whw->dev != NULL) 
+			device_unregister(whw->dev);
+		class_destroy(whw->class);
+		ieee80211_free_hw(whw->hw);
+	}
 
 	return 0;
 }

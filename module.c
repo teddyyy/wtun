@@ -12,11 +12,9 @@ int destroy_wtun_dev(void);
 int create_netfilter_hook(void);
 int destroy_netfilter_hook(void);
 
-static int	__init wtun_init(void)
+static int __init wtun_init(void)
 {
 	int ret;
-
-	pr_info("%s\n", __func__);
 
 	if (dst_addr == NULL) {
 		pr_err("No destination address\n");
@@ -24,20 +22,28 @@ static int	__init wtun_init(void)
 	}
 
 	ret = create_wtun_dev();
-	if (ret < 0) return -1;
+	if (ret < 0) {
+		pr_err("Failed create wtun device\n");
+		return -1;
+	}
 
 	ret = create_netfilter_hook();
-	if (ret < 0) return -1;
+	if (ret < 0) {
+		pr_err("Failed create wtun netfilter\n");
+		return -1;
+	}
+
+	pr_info("%s: Sucessfully module inited\n", __func__);
 
 	return 0;
 }
 
-static void	__exit wtun_exit(void)
+static void __exit wtun_exit(void)
 {
-	pr_info("%s\n", __func__);
-
 	destroy_netfilter_hook();
 	destroy_wtun_dev();
+
+	pr_info("%s: Sucessfully module removed\n", __func__);
 }
 
 module_init(wtun_init);

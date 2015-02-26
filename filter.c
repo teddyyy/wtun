@@ -45,14 +45,16 @@ static unsigned int wtun_hook_funk(unsigned int hooknum,
                         		int (*okfn)(struct sk_buff*))
 {
 	if (is_tunnel_data(skb)) {
-		pr_info("tunnel_data: true %s\n", __func__);
+		int iphlen, rest_wtun_header_len;
+		struct wtun_hw *whw = NULL;
+
 		struct iphdr *iph = ip_hdr(skb);
-                int iphlen = iph->ihl << 2;
-                int rest_wtun_header_len = iphlen + sizeof(struct udphdr);
-		struct wtun_hw *whw = get_wtun_dev();
+        	pr_info("is_tunnel_data\n");
+                iphlen = iph->ihl << 2;
+                rest_wtun_header_len = iphlen + sizeof(struct udphdr);
+		whw = get_wtun_dev();
 
 		skb_pull(skb, rest_wtun_header_len);
-
 		if (skb == NULL)
 			ieee80211_rx_irqsafe(whw->hw, skb);
 		
