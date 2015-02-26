@@ -10,9 +10,9 @@ static int start_wtun_dev(struct ieee80211_hw *phw);
 static void stop_wtun_dev(struct ieee80211_hw *phw);
 
 static int add_interface_wtun_dev(struct ieee80211_hw *phw,
-					struct ieee80211_vif *pvif);
+				struct ieee80211_vif *pvif);
 static void remove_interface_wtun_dev(struct ieee80211_hw *phw,
-                 			struct ieee80211_vif *pvif);
+                 		struct ieee80211_vif *pvif);
 
 static int config_wtun_dev(struct ieee80211_hw *phw, u32 changed);
 static void configure_filter_wtun_dev(struct ieee80211_hw *phw,
@@ -23,16 +23,17 @@ static void changed_bss_info_wtun_dev(struct ieee80211_hw *phw,
 					struct ieee80211_vif *pvif,
 					struct ieee80211_bss_conf *bss,
 					u32 changed);
+
 static int sta_add_wtun_dev(struct ieee80211_hw *phw,
-					struct ieee80211_vif *vif,
-					struct ieee80211_sta *sta);
+				struct ieee80211_vif *vif,
+				struct ieee80211_sta *sta);
 static int sta_remove_wtun_dev(struct ieee80211_hw *phw,
-					struct ieee80211_vif *vif,
-					struct ieee80211_sta *sta);
+				struct ieee80211_vif *vif,
+				struct ieee80211_sta *sta);
 static void sta_notify_wtun_dev(struct ieee80211_hw *phw,
-					struct ieee80211_vif *vif,
-					enum sta_notify_cmd emd,
-					struct ieee80211_sta *sta);
+				struct ieee80211_vif *vif,
+				enum sta_notify_cmd emd,
+				struct ieee80211_sta *sta);
 
 static void transmit_wtun_dev(struct ieee80211_hw *phw,
            			struct sk_buff *skb);
@@ -197,30 +198,31 @@ void transmit_beacon(void *p, u8* mac,
 	struct sk_buff *skb = NULL;
 
 	if (true == whw->active) {
-		pr_info("%s: true\n", __func__);
 		skb = ieee80211_beacon_get(hw, vif);
 
-		if (NULL != skb) 
-				send_by_tunnel(skb);
-		
+		if (NULL != skb) {
+			pr_info("beacon send by tunnel\n");
+			send_by_tunnel(skb);
+		}	
 		whw->ubeacons_count++;
 		dev_kfree_skb(skb);
 	}
-			
 }
 
 static int transmit_thread(void *p)
 {
 	struct wtun_hw *phw = (struct wtun_hw *)p;
 	unsigned long ctime;
-	int var = 3;
+	unsigned int uqos = 1;
 
 	set_user_nice(current, -20);
 
 	ctime = jiffies + phw->ubeacons;
 	while ((false == kthread_should_stop()) &&
 		(false != phw->active)) {
-		wait_event_interruptible(phw->plist, var != 0);
+		wait_event_interruptible_timeout(phw->plist,
+						uqos < 4,
+						whw->ubeacons);
 		if (true == phw->active) {
 			if (jiffies > ctime) {
 				ieee80211_iterate_active_interfaces_atomic(phw->hw,
@@ -230,16 +232,13 @@ static int transmit_thread(void *p)
 				phw->ubeacons_count++;		
 			}
 		}
-		msleep(1000);
+		msleep(100);
 	}
 						
-
-	while ((false == kthread_should_stop())) {
+	while ((false == kthread_should_stop())) 
 		msleep(1000);
-	}
 
 	return 0;
-
 }
 
 static void transmit_wtun_dev(struct ieee80211_hw *phw,
@@ -271,7 +270,6 @@ static void transmit_wtun_dev(struct ieee80211_hw *phw,
 			tx_info->flags |= IEEE80211_TX_STAT_ACK;
 		ieee80211_tx_status_irqsafe(hw->hw, skb);
 	}
-		
 }
 
 struct wtun_hw* get_wtun_dev(void)
@@ -372,7 +370,7 @@ int create_wtun_dev(void)
     	whw->band.ht_cap.mcs.tx_params = IEEE80211_HT_MCS_TX_DEFINED;
     	whw->hw->wiphy->bands[IEEE80211_BAND_2GHZ] = &whw->band;
 
-	sprintf(whw->pname, "wtunsendbeacon");
+	sprintf(whw->pname, "xmit_thread");
 	whw->pth = (void *)kthread_run(transmit_thread, (void *)whw, whw->pname);
 
 	ret = ieee80211_register_hw(whw->hw);
