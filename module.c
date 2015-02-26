@@ -1,0 +1,48 @@
+#include "wtun.h"
+
+char	*dst_addr = NULL;
+int	dst_port = 50000;
+
+module_param(dst_addr, charp, S_IRUSR);
+module_param(dst_port, int, S_IRUSR);
+
+int create_wtun_dev(void);
+int destroy_wtun_dev(void);
+
+int create_netfilter_hook(void);
+int destroy_netfilter_hook(void);
+
+static int	__init wtun_init(void)
+{
+	int ret;
+
+	pr_info("%s\n", __func__);
+
+	if (dst_addr == NULL) {
+		pr_err("No destination address\n");
+		return -1;
+	}
+
+	ret = create_wtun_dev();
+	if (ret < 0) return -1;
+
+	ret = create_netfilter_hook();
+	if (ret < 0) return -1;
+
+	return 0;
+}
+
+static void	__exit wtun_exit(void)
+{
+	pr_info("%s\n", __func__);
+
+	destroy_netfilter_hook();
+	destroy_wtun_dev();
+}
+
+module_init(wtun_init);
+module_exit(wtun_exit);
+
+MODULE_AUTHOR("KIMOTO Mizuki");
+MODULE_DESCRIPTION("Wireless Tunnel Kernel Module");
+MODULE_LICENSE("GPL");
