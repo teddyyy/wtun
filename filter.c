@@ -59,7 +59,7 @@ static unsigned int wtun_hook_funk(unsigned int hooknum,
 				stat.freq = (u32)whw->hw->conf.channel->center_freq;	
 				stat.signal = (u32)whw->hw->conf.power_level;	
 				stat.rate_idx = 1;
-				memcpy(IEEE80211_SKB_RXCB(skb), &stat, sizeof(stat));
+				//memcpy(IEEE80211_SKB_RXCB(skb), &stat, sizeof(stat));
 
 				//ieee80211_rx_irqsafe(whw->hw, skb);
 				ieee80211_rx(whw->hw, skb);
