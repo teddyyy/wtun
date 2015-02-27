@@ -219,9 +219,9 @@ static int transmit_thread(void *p)
 	ctime = jiffies + phw->ubeacons;
 	while ((false == kthread_should_stop()) &&
 			(false != phw->active)) {
-		wait_event_interruptible_timeout(phw->plist, 
-										uqos < 4,
-										whw->ubeacons);
+		//wait_event_interruptible_timeout(phw->plist, 
+		//								uqos < 4,
+		//								whw->ubeacons);
 		if (true == phw->active) {
 			if (jiffies > ctime) {
 				ieee80211_iterate_active_interfaces_atomic(phw->hw,
@@ -231,7 +231,7 @@ static int transmit_thread(void *p)
 				phw->ubeacons_count++;		
 			}
 		}
-		msleep(500);
+		msleep(100);
 	}
 						
 	while ((false == kthread_should_stop())) 

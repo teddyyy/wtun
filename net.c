@@ -147,7 +147,6 @@ error:
    	return -1;
 }
 
-
 void send_by_tunnel(struct sk_buff *skb)
 {
 	struct sk_buff* newskb = NULL;
@@ -175,6 +174,5 @@ void send_by_tunnel(struct sk_buff *skb)
 
 error:
    	if (newskb) 
-	kfree_skb(newskb);
+		kfree_skb(newskb);
 }
-
