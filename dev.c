@@ -208,20 +208,40 @@ void transmit_beacon(void *p, u8* mac, struct ieee80211_vif *vif)
 	}
 }
 
+static int skb_polling(void *p)
+{
+	struct wtun_hw *phw = (struct wtun_hw *)p;
+	int ret = 0;
+	unsigned long flags;
+
+	if (phw != NULL) {
+		if (phw->active == true) {
+			spin_lock_irqsave(&phw->pspin, flags);
+			if (skb_queue_len(&phw->head_skb) > 0) 
+				ret = 1;
+			spin_unlock_irqrestore(&phw->pspin, flags);
+		} else {
+			ret = -1;
+		}
+	}
+	
+	return ret;
+}
+
 static int transmit_thread(void *p)
 {
 	struct wtun_hw *phw = (struct wtun_hw *)p;
 	unsigned long ctime;
-	unsigned int uqos = 1;
+	unsigned int uqos = 0;
 
 	set_user_nice(current, -20);
 
 	ctime = jiffies + phw->ubeacons;
 	while ((false == kthread_should_stop()) &&
 			(false != phw->active)) {
-		//wait_event_interruptible_timeout(phw->plist, 
-		//								uqos < 4,
-		//								whw->ubeacons);
+		wait_event_interruptible_timeout(phw->plist, 
+										((uqos = skb_polling(phw)) > 0),
+										whw->ubeacons);
 		if (true == phw->active) {
 			if (jiffies > ctime) {
 				ieee80211_iterate_active_interfaces_atomic(phw->hw,
@@ -231,7 +251,6 @@ static int transmit_thread(void *p)
 				phw->ubeacons_count++;		
 			}
 		}
-		msleep(100);
 	}
 						
 	while ((false == kthread_should_stop())) 
@@ -245,6 +264,8 @@ static void transmit_wtun_dev(struct ieee80211_hw *phw,
 {
 	struct wtun_hw *hw = (struct wtun_hw *)phw->priv;
 	struct ieee80211_tx_info *tx_info = NULL;
+
+	pr_info("%s\n", __func__);
 
 	if ((hw != NULL) && (skb != NULL)) {
  		struct ieee80211_hdr *ieh = (struct ieee80211_hdr *)skb->data;
@@ -319,8 +340,11 @@ int create_wtun_dev(void)
 	whw->active = true;
 	whw->idle = true;
 	whw->ubeacons = (1024 * HZ) >> 10;
-	init_waitqueue_head(&whw->plist);       
 	whw->ubeacons_count = 0;
+
+	spin_lock_init(&whw->pspin);
+	init_waitqueue_head(&whw->plist);       
+	skb_queue_head_init(&whw->head_skb);
 
 	/* Specify the supported driver name. */
     whw->dev->driver = &wtun_dev_driver;

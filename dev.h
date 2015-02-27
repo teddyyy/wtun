@@ -73,5 +73,6 @@ struct wtun_hw {
 	void *pth;
 	spinlock_t pspin;
 	wait_queue_head_t plist;
+	struct sk_buff_head head_skb;
 };
 
