@@ -42,6 +42,7 @@ static unsigned int wtun_hook_funk(unsigned int hooknum,
 {
 	if (is_tunnel_data(skb)) {
 		int iphlen, rest_wtun_header_len;
+		struct ieee80211_rx_status stat;
 		struct wtun_hw *whw = NULL;
 
 		struct iphdr *iph = ip_hdr(skb);
@@ -52,8 +53,18 @@ static unsigned int wtun_hook_funk(unsigned int hooknum,
 		if (whw != NULL) {
 			skb_pull(skb, rest_wtun_header_len);
 			if (skb != NULL) {
-				ieee80211_rx_irqsafe(whw->hw, skb);
+				memset(&stat, 0, sizeof(stat));
+			
+				stat.band = (u32)whw->hw->conf.channel->band;
+				stat.freq = (u32)whw->hw->conf.channel->center_freq;	
+				stat.signal = (u32)whw->hw->conf.power_level;	
+				stat.rate_idx = 1;
+				memcpy(IEEE80211_SKB_RXCB(skb), &stat, sizeof(stat));
+
+				//ieee80211_rx_irqsafe(whw->hw, skb);
+				ieee80211_rx(whw->hw, skb);
         		pr_info("ieee80211_rx\n");
+				skb = NULL;
 			}
 		}
 
