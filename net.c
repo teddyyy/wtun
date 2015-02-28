@@ -133,7 +133,6 @@ static int encap_tunnel_skb(struct sk_buff* skb)
    	srcip = find_source_ip(rtbl);
    	memcpy(&srcmac, rtbl->dst.dev->dev_addr, ETH_ALEN);
 
-
 	if (rtbl->rt_dst == rtbl->rt_gateway)
    		get_destination_mac(dstip, rtbl, dstmac);
 	else 
