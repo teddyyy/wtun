@@ -131,10 +131,13 @@ static int encap_tunnel_skb(struct sk_buff* skb)
        	goto error;
 
    	srcip = find_source_ip(rtbl);
-
    	memcpy(&srcmac, rtbl->dst.dev->dev_addr, ETH_ALEN);
-   	//get_destination_mac(dstip, rtbl, dstmac);
-   	get_destination_mac(rtbl->rt_gateway, rtbl, dstmac);
+
+
+	if (rtbl->rt_dst == rtbl->rt_gateway)
+   		get_destination_mac(dstip, rtbl, dstmac);
+	else 
+   		get_destination_mac(rtbl->rt_gateway, rtbl, dstmac);
 
    	encap_tunnel_udp_header(skb, udplen, srcip, dstip);
    	encap_tunnel_ip_header(skb, iplen, srcip, dstip);
