@@ -127,7 +127,7 @@ static int encap_tunnel_skb(struct sk_buff* skb)
     	goto error;
 
    	rtbl = find_routing_table(dstip);
-	if (rtbl < 0)  
+	if (rtbl == NULL)  
        	goto error;
 
    	srcip = find_source_ip(rtbl);
