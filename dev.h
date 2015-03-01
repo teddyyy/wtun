@@ -64,6 +64,7 @@ struct wtun_hw {
 	struct mac_address maddr;
 
 	bool active;
+	bool radio_active;
 	
 	struct ieee80211_supported_band band;		
 	struct ieee80211_channel channel[CHANNEL_SIZE];

@@ -69,7 +69,7 @@ static int start_wtun_dev(struct ieee80211_hw *phw)
 	pr_info("%s\n", __func__);
 
 	if (hw != NULL)
-		hw->active = true;
+		hw->radio_active = true;
 		
 	return 0;
 }
@@ -80,7 +80,7 @@ static void stop_wtun_dev(struct ieee80211_hw *phw)
 	pr_info("%s\n", __func__);
 
 	if (hw != NULL)
-		hw->active = false;
+		hw->radio_active = false;
 }
 
 static int add_interface_wtun_dev(struct ieee80211_hw *phw,
@@ -197,14 +197,16 @@ void transmit_beacon(void *p, u8* mac, struct ieee80211_vif *vif)
 	struct sk_buff *skb = NULL;
 
 	if (true == whw->active) {
-		skb = ieee80211_beacon_get(hw, vif);
+		if (true == whw->radio_active) {
+			skb = ieee80211_beacon_get(hw, vif);
 
-		if (NULL != skb) {
-			//pr_info("beacon send by tunnel\n");
-			send_by_tunnel(skb);
-		}	
-		whw->ubeacons_count++;
-		dev_kfree_skb(skb);
+			if (NULL != skb) {
+				//pr_info("beacon send by tunnel\n");
+				send_by_tunnel(skb);
+			}	
+			whw->ubeacons_count++;
+			dev_kfree_skb(skb);
+		}
 	}
 }
 
@@ -243,12 +245,14 @@ static int transmit_thread(void *p)
 										((uqos = skb_polling(phw)) > 0),
 										whw->ubeacons);
 		if (true == phw->active) {
-			if (jiffies > ctime) {
-				ieee80211_iterate_active_interfaces_atomic(phw->hw,
-									   						transmit_beacon,
-									   						phw->hw);
-				ctime = jiffies + phw->ubeacons;
-				phw->ubeacons_count++;		
+			if (true == phw->radio_active) {
+				if (jiffies > ctime) {
+					ieee80211_iterate_active_interfaces_atomic(phw->hw,
+										   						transmit_beacon,
+										   						phw->hw);
+					ctime = jiffies + phw->ubeacons;
+					phw->ubeacons_count++;		
+				}
 			}
 		}
 	}
@@ -269,7 +273,7 @@ static void transmit_wtun_dev(struct ieee80211_hw *phw,
 
 	if ((hw != NULL) && (skb != NULL)) {
  		struct ieee80211_hdr *ieh = (struct ieee80211_hdr *)skb->data;
-		if ((hw->active == true) && (ieh != NULL)) {
+		if ((hw->radio_active == true) && (ieh != NULL)) {
 			if (skb->len < 10) {
 				dev_kfree_skb(skb);
 				pr_info("dev_kfree_skb\n");
@@ -338,6 +342,7 @@ int create_wtun_dev(void)
 
 	/* setup wireless driver */
 	whw->active = true;
+	whw->radio_active = false;
 	whw->idle = true;
 	whw->ubeacons = (1024 * HZ) >> 10;
 	whw->ubeacons_count = 0;
@@ -418,6 +423,9 @@ class_del:
 int destroy_wtun_dev(void)
 {
 	pr_info("%s\n", __func__);
+
+	whw->active = false;
+	whw->radio_active = false;
 
 	if (whw->pth != NULL) {
 		kthread_stop((struct task_struct *)whw->pth);
