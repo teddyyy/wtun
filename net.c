@@ -1,6 +1,8 @@
 #include "wtun.h"
 #include "net.h"
 
+static const char llc_ip_hdr[8] = {0xAA, 0xAA, 0x3, 0, 0, 0, 0x08, 0};
+
 static void encap_tunnel_udp_header(struct sk_buff* skb, 
 									int udplen, 
 									u32 srcip, 
@@ -152,20 +154,22 @@ error:
 
 bool is_wanted_data(struct sk_buff *skb)
 {
-	struct ethhdr *eth = eth_hdr(skb);
-	struct iphdr *iph = ip_hdr(skb);
+	struct ieee80211_hdr *ieh = (struct ieee80211_hdr *)skb->data;
+	__le16 fc = ieh->frame_control;
 
-	if (!skb) return false;
-	if (!eth) return false;
-	
-	if (ETH_P_ARP == ntohs(eth->h_proto)) return true;
+	if (ieee80211_is_data(fc)) {
+		pr_info("data\n");
+		return true;
+	}
 
-	if (ETH_P_IP == ntohs(eth->h_proto)) {
-		if (!iph) return false;
-	
-		if (iph->protocol == IPPROTO_UDP) return true;
-		if (iph->protocol == IPPROTO_TCP) return true;
-		if (iph->protocol == IPPROTO_ICMP) return true;
+	if (ieee80211_is_mgmt(fc)) {
+		pr_info("mgmt\n");
+		return true;
+	}
+
+	if (ieee80211_is_ctl(fc)) {
+		pr_info("ctl\n");
+		return true;
 	}
 
 	return false;

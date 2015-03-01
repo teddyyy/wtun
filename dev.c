@@ -269,15 +269,17 @@ static void transmit_wtun_dev(struct ieee80211_hw *phw,
 	struct ieee80211_tx_info *tx_info = NULL;
 
 	if ((hw != NULL) && (skb != NULL)) {
- 		struct ieee80211_hdr *ieh = (struct ieee80211_hdr *)skb->data;
-		if ((hw->radio_active == true) && (ieh != NULL)) {
+ 		//struct ieee80211_hdr *ieh = (struct ieee80211_hdr *)skb->data;
+		//if ((hw->radio_active == true) && (ieh != NULL)) {
+		if ((hw->radio_active == true)) {
 			if (skb->len < 10) 
 				dev_kfree_skb(skb);
-			else if (is_wanted_data(skb)) {
-				pr_info("packet is encaped\n");
-				send_by_tunnel(skb);
-			}
-		}
+			else 
+				if (is_wanted_data(skb)) {
+					pr_info("packet is encaped\n");
+					send_by_tunnel(skb);
+				}
+ 		}
 
 		skb_orphan(skb);
 		skb_dst_drop(skb);

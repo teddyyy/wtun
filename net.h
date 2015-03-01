@@ -4,6 +4,7 @@
 #include <linux/inetdevice.h>
 
 #include <net/route.h>
+#include <net/cfg80211.h>
 #include <asm/unaligned.h>
 
 bool is_wanted_data(struct sk_buff *skb);
