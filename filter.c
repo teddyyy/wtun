@@ -61,8 +61,7 @@ static unsigned int wtun_hook_funk(unsigned int hooknum,
 				stat.rate_idx = 1;
 				memcpy(IEEE80211_SKB_RXCB(skb), &stat, sizeof(stat));
 
-				//ieee80211_rx_irqsafe(whw->hw, skb);
-				if (whw->radio_active == true) {
+				if (whw->radio_active == true && whw->active == true) {
 					ieee80211_rx(whw->hw, skb);
         			pr_info("ieee80211_rx\n");
 					skb = NULL;

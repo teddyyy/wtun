@@ -150,6 +150,27 @@ error:
    	return -1;
 }
 
+bool is_wanted_data(struct sk_buff *skb)
+{
+	struct ethhdr *eth = eth_hdr(skb);
+	struct iphdr *iph = ip_hdr(skb);
+
+	if (!skb) return false;
+	if (!eth) return false;
+	
+	if (ETH_P_ARP == ntohs(eth->h_proto)) return false;
+
+	if (ETH_P_IP == ntohs(eth->h_proto)) {
+		if (!iph) return false;
+	
+		if (iph->protocol == IPPROTO_UDP) return true;
+		if (iph->protocol == IPPROTO_TCP) return true;
+		if (iph->protocol == IPPROTO_ICMP) return true;
+	}
+
+	return false;
+}
+
 void send_by_tunnel(struct sk_buff *skb)
 {
 	struct sk_buff* newskb = NULL;

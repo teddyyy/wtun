@@ -200,10 +200,9 @@ void transmit_beacon(void *p, u8* mac, struct ieee80211_vif *vif)
 		if (true == whw->radio_active) {
 			skb = ieee80211_beacon_get(hw, vif);
 
-			if (NULL != skb) {
-				//pr_info("beacon send by tunnel\n");
+			if (NULL != skb) 
 				send_by_tunnel(skb);
-			}	
+				
 			whw->ubeacons_count++;
 			dev_kfree_skb(skb);
 		}
@@ -269,19 +268,15 @@ static void transmit_wtun_dev(struct ieee80211_hw *phw,
 	struct wtun_hw *hw = (struct wtun_hw *)phw->priv;
 	struct ieee80211_tx_info *tx_info = NULL;
 
-	//pr_info("%s\n", __func__);
-
 	if ((hw != NULL) && (skb != NULL)) {
  		struct ieee80211_hdr *ieh = (struct ieee80211_hdr *)skb->data;
 		if ((hw->radio_active == true) && (ieh != NULL)) {
-			if (skb->len < 10) {
+			if (skb->len < 10) 
 				dev_kfree_skb(skb);
-				pr_info("dev_kfree_skb\n");
-			}
-			else 
+			if (is_wanted_data(skb))
 				send_by_tunnel(skb);
-			
 		}
+
 		skb_orphan(skb);
 		skb_dst_drop(skb);
 		skb->mark = 0;
