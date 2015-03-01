@@ -273,8 +273,10 @@ static void transmit_wtun_dev(struct ieee80211_hw *phw,
 		if ((hw->radio_active == true) && (ieh != NULL)) {
 			if (skb->len < 10) 
 				dev_kfree_skb(skb);
-			if (is_wanted_data(skb))
+			else if (is_wanted_data(skb)) {
+				pr_info("packet is encaped\n");
 				send_by_tunnel(skb);
+			}
 		}
 
 		skb_orphan(skb);
