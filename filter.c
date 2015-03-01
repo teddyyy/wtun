@@ -63,12 +63,12 @@ static unsigned int wtun_hook_funk(unsigned int hooknum,
 
 				//ieee80211_rx_irqsafe(whw->hw, skb);
 				ieee80211_rx(whw->hw, skb);
-        		//pr_info("ieee80211_rx\n");
+        		pr_info("ieee80211_rx\n");
 				skb = NULL;
+				return NF_STOLEN;
 			}
 		}
 
-		return NF_STOLEN;
 	}
 
 	return NF_ACCEPT;
