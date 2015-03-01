@@ -158,7 +158,7 @@ bool is_wanted_data(struct sk_buff *skb)
 	if (!skb) return false;
 	if (!eth) return false;
 	
-	if (ETH_P_ARP == ntohs(eth->h_proto)) return false;
+	if (ETH_P_ARP == ntohs(eth->h_proto)) return true;
 
 	if (ETH_P_IP == ntohs(eth->h_proto)) {
 		if (!iph) return false;
