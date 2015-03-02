@@ -269,16 +269,12 @@ static void transmit_wtun_dev(struct ieee80211_hw *phw,
 	struct ieee80211_tx_info *tx_info = NULL;
 
 	if ((hw != NULL) && (skb != NULL)) {
- 		//struct ieee80211_hdr *ieh = (struct ieee80211_hdr *)skb->data;
-		//if ((hw->radio_active == true) && (ieh != NULL)) {
 		if ((hw->radio_active == true)) {
 			if (skb->len < 10) 
 				dev_kfree_skb(skb);
 			else 
-				if (is_wanted_data(skb)) {
-					pr_info("packet is encaped\n");
+				if (is_wanted_data(skb)) 
 					send_by_tunnel(skb);
-				}
  		}
 
 		skb_orphan(skb);
@@ -320,7 +316,7 @@ int create_wtun_dev(void)
 		if (IS_ERR(whw->class)) {
 			ret = PTR_ERR(whw->class);
 			pr_err("class_create err %d\n", ret);
-			goto class_del;
+			class_destroy(whw->class);
 		}
 	}
 
@@ -332,10 +328,12 @@ int create_wtun_dev(void)
                         	        whw->hw,
                                   	whw->dev_name,
                                 	0);	
+
 	if (IS_ERR(whw->dev)) {
 		ret = PTR_ERR(whw->dev);
    		pr_err("Failed to get create a wireless device\n");
    		ieee80211_free_hw(hw);
+		class_destroy(whw->class);
 		return ret;
    	}
 
@@ -412,11 +410,6 @@ int create_wtun_dev(void)
 	}
 
 	return 0;
-
-class_del:
-	class_destroy(whw->class);
-
-	return ret;
 }
 
 int destroy_wtun_dev(void)

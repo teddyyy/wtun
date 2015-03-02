@@ -1,8 +1,6 @@
 #include "wtun.h"
 #include "net.h"
 
-static const char llc_ip_hdr[8] = {0xAA, 0xAA, 0x3, 0, 0, 0, 0x08, 0};
-
 static void encap_tunnel_udp_header(struct sk_buff* skb, 
 									int udplen, 
 									u32 srcip, 
