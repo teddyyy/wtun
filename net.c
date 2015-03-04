@@ -28,7 +28,6 @@ static void encap_tunnel_ip_header(struct sk_buff* skb,
 									u32 dstip)
 {
    	static atomic_t ip_ident;
-
    	struct iphdr* iph = NULL;
 
    	skb_push(skb, sizeof(struct iphdr));
@@ -101,17 +100,6 @@ static void get_destination_mac(u32 dstip,
 
 static int encap_tunnel_skb(struct sk_buff* skb)
 {
-   	// i copy some contents in netpoll_send_udp(), modify them,
-   	// and separate them into the following functions:
-   	//
-   	// 1. this function (encap_tunnel_skb)
-   	// 2. encap_tunnel_udp_header
-   	// 3. encap_tunnel_ip_header
-   	// 4. encap_tunnel_eth_header
-   	//
-   	// if you want to know more,
-   	// see netpoll_send_udp() in "netpoll.c" of linux kernel source.
-
    	int payloadlen, udplen, iplen;
    	u32 srcip, dstip;
    	u8  srcmac[ETH_ALEN], dstmac[ETH_ALEN];
@@ -176,13 +164,8 @@ bool is_wanted_data(struct sk_buff *skb)
 void send_by_tunnel(struct sk_buff *skb)
 {
 	struct sk_buff* newskb = NULL;
-   	// tunnel header will be packed by ourself
-   	// we can limit ip header size to 20 bytes = sizeof(struct iphdr)
    	int headroom = sizeof(struct ethhdr) + sizeof(struct iphdr) + sizeof(struct udphdr);
    	int ret;
-
-   	// skb_realloc_headroom will return a new skb which is created 
-	// by skb_clone or skb_copy in different cases.
 
    	newskb = skb_realloc_headroom(skb, headroom);
 	if (newskb == NULL)  

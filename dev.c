@@ -207,6 +207,7 @@ void transmit_beacon(void *p, u8* mac, struct ieee80211_vif *vif)
 				whw->ubeacons_count++;
 				dev_kfree_skb(skb);
 		}
+		msleep(1000);
 	}
 }
 
