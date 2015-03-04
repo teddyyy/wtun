@@ -140,10 +140,10 @@ static void changed_bss_info_wtun_dev(struct ieee80211_hw *phw,
 	pr_info("%s\n", __func__);
 
 	if ((vif != NULL ) && (whw != NULL)) {
-		if (vif->active == true) {
+		if (vif->active) {
 			if (changed & BSS_CHANGED_BEACON_INT) {
 				whw->ubeacons = (bss->beacon_int * HZ) >> 10;
-				if (whw->ubeacons == 0)
+				if (!whw->ubeacons)
 					whw->ubeacons = 1;
 			}
 		}
@@ -159,7 +159,7 @@ static int sta_add_wtun_dev(struct ieee80211_hw *phw,
 
 	pr_info("%s\n", __func__);
 
-	if (vint->active == true)
+	if (vint->active)
 		sta_data->active = true;
 
 	return 0;
@@ -174,7 +174,7 @@ static int sta_remove_wtun_dev(struct ieee80211_hw *phw,
 
 	pr_info("%s\n", __func__);
 
-	if (vint->active == true)
+	if (vint->active)
 		sta_data->active = false;
 
 	return 0;
@@ -196,15 +196,16 @@ void transmit_beacon(void *p, u8* mac, struct ieee80211_vif *vif)
 	struct wtun_hw *whw = (struct wtun_hw *)hw->priv;
 	struct sk_buff *skb = NULL;
 
-	if (true == whw->active) {
-		if (true == whw->radio_active) {
+	if (whw->active) {
+		if (whw->radio_active) {
 			skb = ieee80211_beacon_get(hw, vif);
 
 			if (NULL != skb) 
-				send_by_tunnel(skb);
+				if (is_wanted_data(skb)) 
+					send_by_tunnel(skb);
 				
-			whw->ubeacons_count++;
-			dev_kfree_skb(skb);
+				whw->ubeacons_count++;
+				dev_kfree_skb(skb);
 		}
 	}
 }
@@ -216,14 +217,13 @@ static int skb_polling(void *p)
 	unsigned long flags;
 
 	if (phw != NULL) {
-		if (phw->active == true) {
+		if (phw->active) {
 			spin_lock_irqsave(&phw->pspin, flags);
 			if (skb_queue_len(&phw->head_skb) > 0) 
 				ret = 1;
 			spin_unlock_irqrestore(&phw->pspin, flags);
-		} else {
+		} else 
 			ret = -1;
-		}
 	}
 	
 	return ret;
@@ -243,8 +243,8 @@ static int transmit_thread(void *p)
 		wait_event_interruptible_timeout(phw->plist, 
 										((uqos = skb_polling(phw)) > 0),
 										whw->ubeacons);
-		if (true == phw->active) {
-			if (true == phw->radio_active) {
+		if (phw->active) {
+			if (phw->radio_active) {
 				if (jiffies > ctime) {
 					ieee80211_iterate_active_interfaces_atomic(phw->hw,
 										   						transmit_beacon,
@@ -269,7 +269,7 @@ static void transmit_wtun_dev(struct ieee80211_hw *phw,
 	struct ieee80211_tx_info *tx_info = NULL;
 
 	if ((hw != NULL) && (skb != NULL)) {
-		if ((hw->radio_active == true)) {
+		if ((hw->radio_active)) {
 			if (skb->len < 10) 
 				dev_kfree_skb(skb);
 			else 
@@ -288,6 +288,7 @@ static void transmit_wtun_dev(struct ieee80211_hw *phw,
 		if (0 == (tx_info->flags & IEEE80211_TX_CTL_NO_ACK))
 			tx_info->flags |= IEEE80211_TX_STAT_ACK;
 		ieee80211_tx_status_irqsafe(hw->hw, skb);
+
 	}
 }
 
@@ -428,7 +429,8 @@ int destroy_wtun_dev(void)
 		ieee80211_unregister_hw(whw->hw);
 		if (whw->dev != NULL) 
 			device_unregister(whw->dev);
-		class_destroy(whw->class);
+		if (whw->class != NULL) 
+			class_destroy(whw->class);
 		ieee80211_free_hw(whw->hw);
 	}
 

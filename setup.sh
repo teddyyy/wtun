@@ -5,6 +5,7 @@ if [ "X$2" = "X" ]; then
 	exit -1
 fi
 
+sudo rmmod wtun
 sudo insmod wtun.ko dst_addr=$1
 
 sudo iwconfig wlan0 mode ad-hoc
