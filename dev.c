@@ -139,7 +139,7 @@ static void changed_bss_info_wtun_dev(struct ieee80211_hw *phw,
 	struct wtun_hw *whw = (struct wtun_hw *)phw->priv;
 	pr_info("%s\n", __func__);
 
-	if ((vif != NULL ) && (whw != NULL)) {
+	if ((vif != NULL) && (whw != NULL)) {
 		if (vif->active) {
 			if (changed & BSS_CHANGED_BEACON_INT) {
 				whw->ubeacons = (bss->beacon_int * HZ) >> 10;
@@ -285,7 +285,7 @@ static void transmit_wtun_dev(struct ieee80211_hw *phw,
 
 		tx_info = IEEE80211_SKB_CB(skb);
 		ieee80211_tx_info_clear_status(tx_info);
-		if (0 == (tx_info->flags & IEEE80211_TX_CTL_NO_ACK))
+		if (!(tx_info->flags & IEEE80211_TX_CTL_NO_ACK))
 			tx_info->flags |= IEEE80211_TX_STAT_ACK;
 		ieee80211_tx_status_irqsafe(hw->hw, skb);
 
