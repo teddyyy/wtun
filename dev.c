@@ -143,7 +143,7 @@ static void changed_bss_info_wtun_dev(struct ieee80211_hw *phw,
 		if (vif->active) {
 			if (changed & BSS_CHANGED_BEACON_INT) {
 				whw->ubeacons = (bss->beacon_int * HZ) >> 10;
-				if (!whw->ubeacons)
+				if (whw->ubeacons == 0)
 					whw->ubeacons = 1;
 			}
 		}
@@ -238,8 +238,7 @@ static int transmit_thread(void *p)
 	set_user_nice(current, -20);
 
 	ctime = jiffies + phw->ubeacons;
-	while ((false == kthread_should_stop()) &&
-			(false != phw->active)) {
+	while ((!kthread_should_stop()) && (phw->active)) {
 		wait_event_interruptible_timeout(phw->plist, 
 										((uqos = skb_polling(phw)) > 0),
 										whw->ubeacons);
@@ -256,7 +255,7 @@ static int transmit_thread(void *p)
 		}
 	}
 						
-	while ((false == kthread_should_stop())) 
+	while ((!kthread_should_stop())) 
 		msleep(1000);
 
 	return 0;
@@ -433,6 +432,8 @@ int destroy_wtun_dev(void)
 			class_destroy(whw->class);
 		ieee80211_free_hw(whw->hw);
 	}
+
+	whw = NULL;
 
 	return 0;
 }
