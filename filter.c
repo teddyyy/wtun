@@ -40,20 +40,25 @@ static unsigned int wtun_hook_funk(unsigned int hooknum,
                        				const struct net_device *out,
                        				int (*okfn)(struct sk_buff*))
 {
+ 	pr_info("%s\n", __func__);
+
 	if (is_tunnel_data(skb)) {
 		int iphlen, rest_wtun_header_len;
 		struct ieee80211_rx_status stat;
 		struct wtun_hw *whw = NULL;
 
+ 		pr_info("%s: is_tunnel_data\n", __func__);
 		struct iphdr *iph = ip_hdr(skb);
         iphlen = iph->ihl << 2;
         rest_wtun_header_len = iphlen + sizeof(struct udphdr);
 		whw = get_wtun_dev();
 
 		if (whw != NULL) {
+ 			pr_info("%s: whw != NULL\n", __func__);
 			skb_pull(skb, rest_wtun_header_len);
 			if (skb != NULL) {
 				memset(&stat, 0, sizeof(stat));
+ 				pr_info("%s: skb != NULL\n", __func__);
 			
 				stat.band = (u32)whw->hw->conf.channel->band;
 				stat.freq = (u32)whw->hw->conf.channel->center_freq;	
