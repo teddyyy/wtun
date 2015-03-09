@@ -35,8 +35,14 @@ static void sta_notify_wtun_dev(struct ieee80211_hw *phw,
 								enum sta_notify_cmd emd,
 								struct ieee80211_sta *sta);
 
-static void transmit_wtun_dev(struct ieee80211_hw *phw,
-           					  struct sk_buff *skb);
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,7,0))
+static void transmit_wtun_dev(struct ieee80211_hw *hw,
+                              struct ieee80211_tx_control *control,
+                              struct sk_buff *skb);
+#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,39))
+static void transmit_wtun_dev(struct ieee80211_hw *hw, 
+							  struct sk_buff *skb);
+#endif
 
 void send_by_tunnel(struct sk_buff *skb);
 
@@ -245,9 +251,16 @@ static int transmit_thread(void *p)
 		if (phw->active) {
 			if (phw->radio_active) {
 				if (jiffies > ctime) {
+					#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,11,0))
 					ieee80211_iterate_active_interfaces_atomic(phw->hw,
 										   						transmit_beacon,
 										   						phw->hw);
+					#else  
+					ieee80211_iterate_active_interfaces_atomic(phw->hw,
+																IEEE80211_IFACE_ITER_NORMAL,
+										   						transmit_beacon,
+										   						phw->hw);
+					#endif
 					ctime = jiffies + phw->ubeacons;
 					phw->ubeacons_count++;		
 				}
