@@ -64,7 +64,6 @@ static unsigned int wtun_hook_funk(unsigned int hooknum,
 
 				if ((whw->radio_active) && (whw->active)) {
 					ieee80211_rx(whw->hw, skb);
-        			pr_info("ieee80211_rx\n");
 					return NF_STOLEN;
 				}
 			}
@@ -95,7 +94,6 @@ static unsigned int wtun_hook_funk(const struct nf_hook_ops *ops,
 			if (skb != NULL) {
 				if ((whw->radio_active) && (whw->active)) {
 					ieee80211_rx(whw->hw, skb);
-        			pr_info("ieee80211_rx\n");
 					return NF_STOLEN;
 				}
 			}
