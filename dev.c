@@ -3,8 +3,6 @@
 #include "net.h"
 
 static struct wtun_hw *whw = NULL;
-//static struct station_data *sta_data = NULL;
-//static struct vint_data *vif_data = NULL;
 
 static int start_wtun_dev(struct ieee80211_hw *phw);
 static void stop_wtun_dev(struct ieee80211_hw *phw);
@@ -165,8 +163,9 @@ static int sta_add_wtun_dev(struct ieee80211_hw *phw,
 
 	pr_info("%s\n", __func__);
 
-	if (vint->active)
-		sta_data->active = true;
+	if ((NULL != sta_data) && (NULL != vint))
+		if (vint->active)
+			sta_data->active = true;
 
 	return 0;
 }
@@ -180,8 +179,9 @@ static int sta_remove_wtun_dev(struct ieee80211_hw *phw,
 
 	pr_info("%s\n", __func__);
 
-	if (vint->active)
-		sta_data->active = false;
+	if ((NULL != sta_data) && (NULL != vint))
+		if (vint->active)
+			sta_data->active = false;
 
 	return 0;
 }
