@@ -90,8 +90,6 @@ static void get_destination_mac(u32 dstip,
    	extern struct neigh_table arp_tbl;
    	struct neighbour* neigh = neigh_lookup(&arp_tbl, &dstip, rtbl->dst.dev);
    	if (!neigh || IS_ERR(neigh)) {
-       	// do broadcast if no neighbour exists.
-       	// i know it is a little dirty, but works.
        	memset(dstmac, 0xff, ETH_ALEN);
    	} else {
        	memcpy(dstmac, neigh->ha, ETH_ALEN);
@@ -115,7 +113,7 @@ static int encap_tunnel_skb(struct sk_buff* skb)
     	goto error;
 
    	rtbl = find_routing_table(dstip);
-	if (rtbl == NULL)  
+	if (NULL == rtbl)  
        	goto error;
 
    	srcip = find_source_ip(rtbl);
@@ -150,20 +148,15 @@ bool is_wanted_data(struct sk_buff *skb)
 	struct ieee80211_hdr *ieh = (struct ieee80211_hdr *)skb->data;
 	__le16 fc = ieh->frame_control;
 
-	if (ieee80211_is_data(fc)) {
-	//	pr_info("data\n");
+	if (ieee80211_is_data(fc)) 
 		return true;
-	}
 
-	if (ieee80211_is_mgmt(fc)) {
-	//	pr_info("mgmt\n");
+	if (ieee80211_is_mgmt(fc)) 
 		return true;
-	}
 
-	if (ieee80211_is_ctl(fc)) {
-	//	pr_info("ctl\n");
+	if (ieee80211_is_ctl(fc)) 
 		return true;
-	}
+	
 
 	return false;
 }
@@ -175,7 +168,7 @@ void send_by_tunnel(struct sk_buff *skb)
    	int ret;
 
    	newskb = skb_realloc_headroom(skb, headroom);
-	if (newskb == NULL)  
+	if (NULL == newskb)  
        	goto error;
 
    	ret = encap_tunnel_skb(newskb);

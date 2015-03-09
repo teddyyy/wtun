@@ -51,9 +51,9 @@ static unsigned int wtun_hook_funk(unsigned int hooknum,
         rest_wtun_header_len = iphlen + sizeof(struct udphdr);
 		whw = get_wtun_dev();
 
-		if (whw != NULL) {
+		if (NULL != whw) {
 			skb_pull(skb, rest_wtun_header_len);
-			if (skb != NULL) {
+			if (NULL != skb) {
 				memset(&stat, 0, sizeof(stat));
 			
 				stat.band = (u32)whw->hw->conf.channel->band;
@@ -89,9 +89,9 @@ static unsigned int wtun_hook_funk(const struct nf_hook_ops *ops,
         rest_wtun_header_len = iphlen + sizeof(struct udphdr);
 		whw = get_wtun_dev();
 
-		if (whw != NULL) {
+		if (NULL != whw) {
 			skb_pull(skb, rest_wtun_header_len);
-			if (skb != NULL) {
+			if (NULL != skb) {
 				if ((whw->radio_active) && (whw->active)) {
 					ieee80211_rx(whw->hw, skb);
 					return NF_STOLEN;

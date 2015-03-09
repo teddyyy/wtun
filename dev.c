@@ -72,7 +72,7 @@ static int start_wtun_dev(struct ieee80211_hw *phw)
 	struct wtun_hw *hw = (struct wtun_hw *)phw->priv;
 	pr_info("%s\n", __func__);
 
-	if (hw != NULL)
+	if (NULL != hw)
 		hw->radio_active = true;
 		
 	return 0;
@@ -83,7 +83,7 @@ static void stop_wtun_dev(struct ieee80211_hw *phw)
 	struct wtun_hw *hw = (struct wtun_hw *)phw->priv;
 	pr_info("%s\n", __func__);
 
-	if (hw != NULL)
+	if (NULL != hw)
 		hw->radio_active = false;
 }
 
@@ -91,9 +91,11 @@ static int add_interface_wtun_dev(struct ieee80211_hw *phw,
                 					struct ieee80211_vif *pvif)
 {
 	struct vint_data *vif = (struct vint_data *)pvif->drv_priv;
+
 	pr_info("%s\n", __func__);
 
-	vif->active = true;
+	if (NULL != vif)
+		vif->active = true;
 
 	return 0;
 }
@@ -104,7 +106,8 @@ static void remove_interface_wtun_dev(struct ieee80211_hw *phw,
 	struct vint_data *vif = (struct vint_data *)pvif->drv_priv;
 	pr_info("%s\n", __func__);
 
-	vif->active = false;
+	if (NULL != vif)
+		vif->active = false;
 }
 
 static int config_wtun_dev(struct ieee80211_hw *phw, u32 changed)
@@ -112,10 +115,9 @@ static int config_wtun_dev(struct ieee80211_hw *phw, u32 changed)
 	struct wtun_hw *hw = NULL;
 	pr_info("%s\n", __func__);
 
-  	if (phw != NULL) {
+  	if (NULL != phw) {
     	hw = (struct wtun_hw *)phw->priv;
-
-    	if (hw != NULL) 
+    	if (NULL != hw) 
       		hw->idle = !!(phw->conf.flags & IEEE80211_CONF_IDLE);
 	}
 
@@ -130,7 +132,7 @@ static void configure_filter_wtun_dev(struct ieee80211_hw *phw,
 	struct wtun_hw *hw = (struct wtun_hw *)phw->priv;
 	pr_info("%s\n", __func__);
 
-	if ((hw != NULL) && (total_flags != NULL)) 
+	if ((NULL != hw) && (NULL != total_flags)) 
 		*total_flags &= (FIF_PROMISC_IN_BSS | FIF_ALLMULTI);
 }
 
@@ -143,7 +145,7 @@ static void changed_bss_info_wtun_dev(struct ieee80211_hw *phw,
 	struct wtun_hw *whw = (struct wtun_hw *)phw->priv;
 	pr_info("%s\n", __func__);
 
-	if ((vif != NULL) && (whw != NULL)) {
+	if ((NULL != vif) && (NULL != whw)) {
 		if (vif->active) {
 			if (changed & BSS_CHANGED_BEACON_INT) {
 				whw->ubeacons = (bss->beacon_int * HZ) >> 10;
@@ -222,7 +224,7 @@ static int skb_polling(void *p)
 	int ret = 0;
 	unsigned long flags;
 
-	if (phw != NULL) {
+	if (NULL != phw) {
 		if (phw->active) {
 			spin_lock_irqsave(&phw->pspin, flags);
 			if (skb_queue_len(&phw->head_skb) > 0) 
@@ -280,7 +282,7 @@ static void xmit_skb_dev(struct ieee80211_hw *phw,
 	struct wtun_hw *hw = (struct wtun_hw *)phw->priv;
 	struct ieee80211_tx_info *tx_info = NULL;
 
-	if ((hw != NULL) && (skb != NULL)) {
+	if ((NULL != hw) && (NULL != skb)) {
 		if ((hw->radio_active)) {
 			if (skb->len < 10) 
 				dev_kfree_skb(skb);
@@ -331,14 +333,13 @@ int create_wtun_dev(void)
 	pr_info("%s\n", __func__);
 
 	hw = ieee80211_alloc_hw(sizeof(whw), &wtun_ops);
-	
-	if (hw == NULL)
+	if (NULL == hw)
 		return -1;
 	
 	whw = (struct wtun_hw *)hw->priv;
 	whw->hw = hw;
 
-	if (whw->class == NULL) {
+	if (NULL == whw->class) {
 		whw->class = class_create(THIS_MODULE, "wtun");
 		if (IS_ERR(whw->class)) {
 			ret = PTR_ERR(whw->class);
@@ -446,16 +447,16 @@ int destroy_wtun_dev(void)
 	whw->active = false;
 	whw->radio_active = false;
 
-	if (whw->pth != NULL) {
+	if (NULL != whw->pth) {
 		kthread_stop((struct task_struct *)whw->pth);
 		whw->pth = NULL;
 	}	
 
-	if (whw->hw != NULL) {
+	if (NULL != whw->hw) {
 		ieee80211_unregister_hw(whw->hw);
-		if (whw->dev != NULL) 
+		if (NULL != whw->dev) 
 			device_unregister(whw->dev);
-		if (whw->class != NULL) 
+		if (NULL != whw->class) 
 			class_destroy(whw->class);
 		ieee80211_free_hw(whw->hw);
 	}

@@ -17,7 +17,7 @@ static int __init wtun_init(void)
 {
 	int	ret;
 
-	if (dst_addr == NULL) {
+	if (NULL == dst_addr) {
 		pr_err("No destination address\n");
 		return -1;
 	}
