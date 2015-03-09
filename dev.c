@@ -3,8 +3,8 @@
 #include "net.h"
 
 static struct wtun_hw *whw = NULL;
-static struct station_data *sta_data = NULL;
-static struct vint_data *vif_data = NULL;
+//static struct station_data *sta_data = NULL;
+//static struct vint_data *vif_data = NULL;
 
 static int start_wtun_dev(struct ieee80211_hw *phw);
 static void stop_wtun_dev(struct ieee80211_hw *phw);
@@ -401,8 +401,8 @@ int create_wtun_dev(void)
       					IEEE80211_HW_SUPPORTS_DYNAMIC_SMPS |
       					IEEE80211_HW_AMPDU_AGGREGATION;
 
-	whw->hw->sta_data_size = sizeof(sta_data);	
-	whw->hw->vif_data_size = sizeof(vif_data);	
+	whw->hw->sta_data_size = sizeof(struct station_data);	
+	whw->hw->vif_data_size = sizeof(struct vint_data);	
 
 	memcpy(whw->channel, wtun_channel, sizeof(wtun_channel));
 	whw->band.channels = whw->channel;
