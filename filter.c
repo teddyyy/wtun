@@ -41,8 +41,6 @@ static unsigned int wtun_hook_funk(unsigned int hooknum,
                        				const struct net_device *out,
                        				int (*okfn)(struct sk_buff*))
 {
-	pr_info("%s\n", __func__);
-
 	if (is_tunnel_data(skb)) {
 		int iphlen, rest_wtun_header_len;
 		struct ieee80211_rx_status stat;
@@ -83,8 +81,6 @@ static unsigned int wtun_hook_funk(const struct nf_hook_ops *ops,
 									const struct net_device *out,
                        				int (*okfn)(struct sk_buff*))
 {
-	pr_info("%s\n", __func__);
-
 	if (is_tunnel_data(skb)) {
 		int iphlen, rest_wtun_header_len;
 		struct wtun_hw *whw = NULL;
