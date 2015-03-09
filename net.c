@@ -151,17 +151,17 @@ bool is_wanted_data(struct sk_buff *skb)
 	__le16 fc = ieh->frame_control;
 
 	if (ieee80211_is_data(fc)) {
-		pr_info("data\n");
+	//	pr_info("data\n");
 		return true;
 	}
 
 	if (ieee80211_is_mgmt(fc)) {
-		pr_info("mgmt\n");
+	//	pr_info("mgmt\n");
 		return true;
 	}
 
 	if (ieee80211_is_ctl(fc)) {
-		pr_info("ctl\n");
+	//	pr_info("ctl\n");
 		return true;
 	}
 
