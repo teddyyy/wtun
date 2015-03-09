@@ -34,6 +34,7 @@ static bool is_tunnel_data(struct sk_buff *skb)
 	return false;
 }
 
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,13,0))
 static unsigned int wtun_hook_funk(unsigned int hooknum,
 									struct sk_buff *skb,
 									const struct net_device *in,
@@ -74,6 +75,40 @@ static unsigned int wtun_hook_funk(unsigned int hooknum,
 
 	return NF_ACCEPT;
 }
+
+#else 
+static unsigned int wtun_hook_funk(const struct nf_hook_ops *ops,
+									struct sk_buff *skb,
+									const struct net_device *in,
+									const struct net_device *out,
+                       				int (*okfn)(struct sk_buff*))
+{
+	pr_info("%s\n", __func__);
+
+	if (is_tunnel_data(skb)) {
+		int iphlen, rest_wtun_header_len;
+		struct wtun_hw *whw = NULL;
+		struct iphdr *iph = ip_hdr(skb);
+
+        iphlen = iph->ihl << 2;
+        rest_wtun_header_len = iphlen + sizeof(struct udphdr);
+		whw = get_wtun_dev();
+
+		if (whw != NULL) {
+			skb_pull(skb, rest_wtun_header_len);
+			if (skb != NULL) {
+				if ((whw->radio_active) && (whw->active)) {
+					ieee80211_rx(whw->hw, skb);
+        			pr_info("ieee80211_rx\n");
+					return NF_STOLEN;
+				}
+			}
+		}
+	}
+
+	return NF_ACCEPT;
+}
+#endif
 
 int create_netfilter_hook(void)
 {
