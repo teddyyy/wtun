@@ -67,14 +67,7 @@ static struct rtable* find_routing_table(u32 dstip)
    	struct rtable* rtbl = NULL;
    	rtbl = ip_route_output_key(&init_net, &fl4);
 
-   	// NOTICE:
-   	//
-   	// ip_route_output_key will return an NON-NULL address even if no routing table found.
-   	// system will be crached (or stuck?) if accessing it.
-   	//
-   	// it is necessary that do an extra check by IS_ERR().
-
-   	return (rtbl && !IS_ERR(rtbl)) ? rtbl : NULL;
+    return (rtbl && !IS_ERR(rtbl)) ? rtbl : NULL;
 }
 
 static u32 find_source_ip(struct rtable* rtbl)

@@ -42,6 +42,12 @@ static void transmit_wtun_dev(struct ieee80211_hw *hw,
 							  struct sk_buff *skb);
 #endif
 
+static int conf_tx_wtun_dev(struct ieee80211_hw *hw,
+                            struct ieee80211_vif *vif,
+                            u16 queue,
+                            const struct ieee80211_tx_queue_params *param);
+
+
 void send_by_tunnel(struct sk_buff *skb);
 
 static struct ieee80211_ops wtun_ops = {
@@ -51,9 +57,8 @@ static struct ieee80211_ops wtun_ops = {
 	.add_interface = add_interface_wtun_dev,
 	.remove_interface = remove_interface_wtun_dev,
 
-	.config = config_wtun_dev,
-	.configure_filter = configure_filter_wtun_dev,
  	.bss_info_changed = changed_bss_info_wtun_dev,
+	.configure_filter = configure_filter_wtun_dev,
 
 	 /* State routines, not importent, but mandatory. */
   	.sta_add = sta_add_wtun_dev,
@@ -61,6 +66,9 @@ static struct ieee80211_ops wtun_ops = {
   	.sta_notify = sta_notify_wtun_dev,
 
 	.tx = transmit_wtun_dev,
+	.config = config_wtun_dev,
+
+	.conf_tx = conf_tx_wtun_dev,
 };
 
 static struct device_driver wtun_dev_driver = {
@@ -320,6 +328,23 @@ static void transmit_wtun_dev(struct ieee80211_hw *hw, struct sk_buff *skb)
 }
 #endif
 
+static int conf_tx_wtun_dev(struct ieee80211_hw *hw,
+							struct ieee80211_vif *vif,
+							u16 queue,
+							const struct ieee80211_tx_queue_params *param)
+{
+	struct wtun_hw *whw = NULL;
+	pr_info("%s\n", __func__);
+
+	if ((NULL != hw) && (NULL != param)) {
+		if (NULL != hw->priv) {
+			whw = (struct wtun_hw *)hw->priv;
+		}
+	}
+
+	return 0;
+}	
+
 struct wtun_hw* get_wtun_dev(void)
 {
 	return whw;
@@ -459,9 +484,8 @@ int destroy_wtun_dev(void)
 		if (NULL != whw->class) 
 			class_destroy(whw->class);
 		ieee80211_free_hw(whw->hw);
+		whw = NULL;
 	}
-
-	whw = NULL;
 
 	return 0;
 }
