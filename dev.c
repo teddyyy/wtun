@@ -261,7 +261,7 @@ static int transmit_thread(void *p)
 	return 0;
 }
 
-static void transmit_wtun_dev(struct ieee80211_hw *phw,
+static void xmit_skb_dev(struct ieee80211_hw *phw,
 								struct sk_buff *skb)
 {
 	struct wtun_hw *hw = (struct wtun_hw *)phw->priv;
@@ -290,6 +290,20 @@ static void transmit_wtun_dev(struct ieee80211_hw *phw,
 
 	}
 }
+
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,7,0))
+static void transmit_wtun_dev(struct ieee80211_hw *hw,
+							  struct ieee80211_tx_control *control,
+                              struct sk_buff *skb)
+{
+	xmit_skb_dev(hw, skb);
+}
+#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,39))
+static void transmit_wtun_dev(struct ieee80211_hw *hw, struct sk_buff *skb)
+{
+	xmit_skb_dev(hw, skb);
+}
+#endif
 
 struct wtun_hw* get_wtun_dev(void)
 {
