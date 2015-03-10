@@ -177,6 +177,8 @@ static int sta_add_wtun_dev(struct ieee80211_hw *phw,
 		if (vint->active)
 			sta_data->active = true;
 
+	pr_info("called phw(%p) vif(%p) sta(%p)\n", phw, vint, sta_data);
+
 	return 0;
 }
 
@@ -192,6 +194,8 @@ static int sta_remove_wtun_dev(struct ieee80211_hw *phw,
 	if ((NULL != sta_data) && (NULL != vint))
 		if (vint->active)
 			sta_data->active = false;
+
+	pr_info("called phw(%p) vif(%p) sta(%p)\n", phw, vint, sta_data);
 
 	return 0;
 }
