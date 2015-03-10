@@ -127,8 +127,11 @@ static int config_wtun_dev(struct ieee80211_hw *phw, u32 changed)
     	hw = (struct wtun_hw *)phw->priv;
     	if (NULL != hw) 
       		hw->idle = !!(phw->conf.flags & IEEE80211_CONF_IDLE);
-	}
-
+		else 
+			pr_info("error hw (%p)\n", hw);
+	} else 
+			pr_info("error phw (%p) changed (%d)\n", phw, changed);
+	
   	return 0;
 }
 
@@ -142,6 +145,9 @@ static void configure_filter_wtun_dev(struct ieee80211_hw *phw,
 
 	if ((NULL != hw) && (NULL != total_flags)) 
 		*total_flags &= (FIF_PROMISC_IN_BSS | FIF_ALLMULTI);
+	else
+		pr_info("error phw (%p) changed_flags (%d) total_flags (%p) multicast (%lld)\n", 
+				phw, changed_flags, total_flags, multicast);
 }
 
 static void changed_bss_info_wtun_dev(struct ieee80211_hw *phw,
@@ -161,6 +167,7 @@ static void changed_bss_info_wtun_dev(struct ieee80211_hw *phw,
 					if (0 == whw->ubeacons)
 						whw->ubeacons = 1;
 				}
+				pr_info("beacons: %lud\n", whw->ubeacons);
 			}
 		}
 	}
