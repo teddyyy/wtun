@@ -156,9 +156,11 @@ static void changed_bss_info_wtun_dev(struct ieee80211_hw *phw,
 	if ((NULL != vif) && (NULL != whw)) {
 		if (vif->active) {
 			if (changed & BSS_CHANGED_BEACON_INT) {
-				whw->ubeacons = (bss->beacon_int * HZ) >> 10;
-				if (!whw->ubeacons)
-					whw->ubeacons = 1;
+				if (NULL != whw) {
+					whw->ubeacons = (bss->beacon_int * HZ) >> 10;
+					if (0 == whw->ubeacons)
+						whw->ubeacons = 1;
+				}
 			}
 		}
 	}
