@@ -141,15 +141,14 @@ bool is_wanted_data(struct sk_buff *skb)
 	struct ieee80211_hdr *ieh = (struct ieee80211_hdr *)skb->data;
 	__le16 fc = ieh->frame_control;
 
-	if (ieee80211_is_data(fc)) 
+	if (likely(ieee80211_is_data(fc))) 
 		return true;
 
-	if (ieee80211_is_mgmt(fc)) 
+	if (likely(ieee80211_is_mgmt(fc)))
 		return true;
 
-	if (ieee80211_is_ctl(fc)) 
+	if (likely(ieee80211_is_ctl(fc)))
 		return true;
-	
 
 	return false;
 }
