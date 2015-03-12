@@ -322,7 +322,8 @@ static void xmit_skb_dev(struct ieee80211_hw *phw,
 		ieee80211_tx_info_clear_status(tx_info);
 		if (!(tx_info->flags & IEEE80211_TX_CTL_NO_ACK))
 			tx_info->flags |= IEEE80211_TX_STAT_ACK;
-		ieee80211_tx_status_irqsafe(hw->hw, skb);
+		//ieee80211_tx_status_irqsafe(hw->hw, skb);
+		ieee80211_tx_status(hw->hw, skb);
 
 	}
 }
