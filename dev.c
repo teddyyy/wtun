@@ -180,7 +180,7 @@ static int sta_add_wtun_dev(struct ieee80211_hw *phw,
 	struct station_data *sta_data = (struct station_data *)sta->drv_priv;
 	struct vint_data *vint = (struct vint_data *)vif->drv_priv;
 
-	pr_info("%s\n", __func__);
+	pr_info("%s: %u\n", __func__, sta->aid);
 
 	if ((NULL != sta_data) && (NULL != vint))
 		if (vint->active)
@@ -198,7 +198,7 @@ static int sta_remove_wtun_dev(struct ieee80211_hw *phw,
 	struct station_data *sta_data = (struct station_data *)sta->drv_priv;
 	struct vint_data *vint = (struct vint_data *)vif->drv_priv;
 
-	pr_info("%s\n", __func__);
+	pr_info("%s: %u\n", __func__, sta->aid);
 
 	if ((NULL != sta_data) && (NULL != vint))
 		if (vint->active)
