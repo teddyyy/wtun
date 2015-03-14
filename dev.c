@@ -272,7 +272,7 @@ static int transmit_thread(void *p)
 		wait_event_interruptible_timeout(phw->plist, 
 										((uqos = skb_polling(phw)) > 0),
 										whw->ubeacons);
-		if (phw->active) {
+		if ((phw->active) && (!phw->idle)) {
 			if (phw->radio_active) {
 				if (jiffies > ctime) {
 					#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,11,0))
@@ -350,9 +350,8 @@ static int conf_tx_wtun_dev(struct ieee80211_hw *hw,
 	pr_info("%s\n", __func__);
 
 	if ((NULL != hw) && (NULL != param)) {
-		if (NULL != hw->priv) {
+		if (NULL != hw->priv) 
 			whw = (struct wtun_hw *)hw->priv;
-		}
 	}
 
 	return 0;
@@ -485,17 +484,19 @@ int destroy_wtun_dev(void)
 	whw->active = false;
 	whw->radio_active = false;
 
-	if (NULL != whw->pth) {
-		kthread_stop((struct task_struct *)whw->pth);
-		whw->pth = NULL;
-	}	
+	if (NULL != whw) {
+		if (NULL != whw->pth) {
+			kthread_stop((struct task_struct *)whw->pth);
+			whw->pth = NULL;
+		}	
 
-	if (NULL != whw->hw) {
-		ieee80211_unregister_hw(whw->hw);
+		if (NULL != whw->hw) 
+			ieee80211_unregister_hw(whw->hw);
 		if (NULL != whw->dev) 
 			device_unregister(whw->dev);
 		if (NULL != whw->class) 
 			class_destroy(whw->class);
+
 		ieee80211_free_hw(whw->hw);
 		whw = NULL;
 	}
