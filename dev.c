@@ -167,7 +167,7 @@ static void changed_bss_info_wtun_dev(struct ieee80211_hw *phw,
 					if (0 == whw->ubeacons)
 						whw->ubeacons = 1;
 				}
-				pr_info("beacons: %lud\n", whw->ubeacons);
+				pr_info("beacons: %lu\n", whw->ubeacons);
 			}
 		}
 	}
@@ -229,12 +229,13 @@ void transmit_beacon(void *p, u8* mac, struct ieee80211_vif *vif)
 		if (whw->radio_active) {
 			skb = ieee80211_beacon_get(hw, vif);
 
-			if (NULL != skb) 
+			if (NULL != skb) {
 				if (is_wanted_data(skb)) 
 					send_by_tunnel(skb);
 				
 				whw->ubeacons_count++;
 				dev_kfree_skb(skb);
+			}
 		}
 	}
 }

@@ -1,8 +1,8 @@
 #include "wtun.h"
 
 char *dst_addr = NULL;
-int	dst_port = 50000;
-int	src_port = 50001;
+int	dst_port = 5055;
+int	src_port = 5065;
 
 module_param(dst_addr, charp, S_IRUSR);
 module_param(dst_port, int, S_IRUSR);
