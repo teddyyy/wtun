@@ -1,6 +1,6 @@
 #include "wtun.h"
 
-char *dst_addr = NULL;
+char	*dst_addr = NULL;
 int	dst_port = 5055;
 int	src_port = 5065;
 
@@ -15,7 +15,7 @@ int destroy_netfilter_hook(void);
 
 static int __init wtun_init(void)
 {
-	int	ret;
+	int ret;
 
 	if (NULL == dst_addr) {
 		pr_err("No destination address\n");
