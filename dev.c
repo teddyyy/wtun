@@ -6,40 +6,37 @@ static struct wtun_hw *whw = NULL;
 
 static int start_wtun_dev(struct ieee80211_hw *phw);
 static void stop_wtun_dev(struct ieee80211_hw *phw);
-
 static int add_interface_wtun_dev(struct ieee80211_hw *phw,
-								  struct ieee80211_vif *pvif);
+				struct ieee80211_vif *pvif);
 static void remove_interface_wtun_dev(struct ieee80211_hw *phw,
-									  struct ieee80211_vif *pvif);
+				struct ieee80211_vif *pvif);
 static int config_wtun_dev(struct ieee80211_hw *phw, u32 changed);
-
 static void configure_filter_wtun_dev(struct ieee80211_hw *phw,
-									  unsigned int changed_flags,
-									  unsigned int *total_flags,
-									  u64 multicast);
+				unsigned int changed_flags,
+				unsigned int *total_flags,
+				u64 multicast);
 static void changed_bss_info_wtun_dev(struct ieee80211_hw *phw,
-									  struct ieee80211_vif *pvif,
-									  struct ieee80211_bss_conf *bss,
-									  u32 changed);
-
+				struct ieee80211_vif *pvif,
+				struct ieee80211_bss_conf *bss,
+				u32 changed);
 static int sta_add_wtun_dev(struct ieee80211_hw *phw,
-							struct ieee80211_vif *vif,
-							struct ieee80211_sta *sta);
+				struct ieee80211_vif *vif,
+				struct ieee80211_sta *sta);
 static int sta_remove_wtun_dev(struct ieee80211_hw *phw,
-							   struct ieee80211_vif *vif,
-							   struct ieee80211_sta *sta);
+				struct ieee80211_vif *vif,
+				struct ieee80211_sta *sta);
 static void sta_notify_wtun_dev(struct ieee80211_hw *phw,
-								struct ieee80211_vif *vif,
-								enum sta_notify_cmd emd,
-								struct ieee80211_sta *sta);
+				struct ieee80211_vif *vif,
+				enum sta_notify_cmd emd,
+				struct ieee80211_sta *sta);
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,7,0))
 static void transmit_wtun_dev(struct ieee80211_hw *hw,
-                              struct ieee80211_tx_control *control,
-                              struct sk_buff *skb);
+				struct ieee80211_tx_control *control,
+				struct sk_buff *skb);
 #elif (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,39))
 static void transmit_wtun_dev(struct ieee80211_hw *hw, 
-							  struct sk_buff *skb);
+				struct sk_buff *skb);
 #endif
 
 static int conf_tx_wtun_dev(struct ieee80211_hw *hw,
@@ -96,7 +93,7 @@ static void stop_wtun_dev(struct ieee80211_hw *phw)
 }
 
 static int add_interface_wtun_dev(struct ieee80211_hw *phw,
-                					struct ieee80211_vif *pvif)
+				struct ieee80211_vif *pvif)
 {
 	struct vint_data *vif = (struct vint_data *)pvif->drv_priv;
 
@@ -109,7 +106,7 @@ static int add_interface_wtun_dev(struct ieee80211_hw *phw,
 }
 
 static void remove_interface_wtun_dev(struct ieee80211_hw *phw,
-                						struct ieee80211_vif *pvif)
+				struct ieee80211_vif *pvif)
 {
 	struct vint_data *vif = (struct vint_data *)pvif->drv_priv;
 	pr_info("%s\n", __func__);
@@ -124,21 +121,21 @@ static int config_wtun_dev(struct ieee80211_hw *phw, u32 changed)
 	pr_info("%s\n", __func__);
 
   	if (NULL != phw) {
-    	hw = (struct wtun_hw *)phw->priv;
-    	if (NULL != hw) 
-      		hw->idle = !!(phw->conf.flags & IEEE80211_CONF_IDLE);
+		hw = (struct wtun_hw *)phw->priv;
+		if (NULL != hw)
+			hw->idle = !!(phw->conf.flags & IEEE80211_CONF_IDLE);
 		else 
 			pr_info("error hw (%p)\n", hw);
 	} else 
-			pr_info("error phw (%p) changed (%d)\n", phw, changed);
+		pr_info("error phw (%p) changed (%d)\n", phw, changed);
 	
   	return 0;
 }
 
 static void configure_filter_wtun_dev(struct ieee80211_hw *phw,
-										unsigned int changed_flags,
-										unsigned int *total_flags,
-										u64 multicast)
+					unsigned int changed_flags,
+					unsigned int *total_flags,
+					u64 multicast)
 {
 	struct wtun_hw *hw = (struct wtun_hw *)phw->priv;
 	pr_info("%s\n", __func__);
@@ -151,9 +148,9 @@ static void configure_filter_wtun_dev(struct ieee80211_hw *phw,
 }
 
 static void changed_bss_info_wtun_dev(struct ieee80211_hw *phw,
-                   						struct ieee80211_vif *pvif,
-                   						struct ieee80211_bss_conf *bss,
-                   						u32 changed)
+					struct ieee80211_vif *pvif,
+					struct ieee80211_bss_conf *bss,
+					u32 changed)
 {
 	struct vint_data *vif = (struct vint_data *)pvif->drv_priv;
 	struct wtun_hw *whw = (struct wtun_hw *)phw->priv;
@@ -174,8 +171,8 @@ static void changed_bss_info_wtun_dev(struct ieee80211_hw *phw,
 }
 
 static int sta_add_wtun_dev(struct ieee80211_hw *phw,
-							struct ieee80211_vif *vif,
-							struct ieee80211_sta *sta)
+					struct ieee80211_vif *vif,
+					struct ieee80211_sta *sta)
 {
 	struct station_data *sta_data = (struct station_data *)sta->drv_priv;
 	struct vint_data *vint = (struct vint_data *)vif->drv_priv;
@@ -192,8 +189,8 @@ static int sta_add_wtun_dev(struct ieee80211_hw *phw,
 }
 
 static int sta_remove_wtun_dev(struct ieee80211_hw *phw,
-							   struct ieee80211_vif *vif,
-							   struct ieee80211_sta *sta)
+					struct ieee80211_vif *vif,
+					struct ieee80211_sta *sta)
 {
 	struct station_data *sta_data = (struct station_data *)sta->drv_priv;
 	struct vint_data *vint = (struct vint_data *)vif->drv_priv;
@@ -210,9 +207,9 @@ static int sta_remove_wtun_dev(struct ieee80211_hw *phw,
 }
 
 static void sta_notify_wtun_dev(struct ieee80211_hw *phw,
-								struct ieee80211_vif *vif,
-								enum sta_notify_cmd cmd,
-								struct ieee80211_sta *sta)
+					struct ieee80211_vif *vif,
+					enum sta_notify_cmd cmd,
+					struct ieee80211_sta *sta)
 {
 	pr_info("%s\n", __func__);
 
@@ -277,13 +274,13 @@ static int transmit_thread(void *p)
 				if (jiffies > ctime) {
 					#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,11,0))
 					ieee80211_iterate_active_interfaces_atomic(phw->hw,
-										   						transmit_beacon,
-										   						phw->hw);
+											transmit_beacon,
+											phw->hw);
 					#else  
 					ieee80211_iterate_active_interfaces_atomic(phw->hw,
-																IEEE80211_IFACE_ITER_NORMAL,
-										   						transmit_beacon,
-										   						phw->hw);
+											IEEE80211_IFACE_ITER_NORMAL,
+											transmit_beacon,
+											phw->hw);
 					#endif
 					ctime = jiffies + phw->ubeacons;
 					phw->ubeacons_count++;		
@@ -299,7 +296,7 @@ static int transmit_thread(void *p)
 }
 
 static void xmit_skb_dev(struct ieee80211_hw *phw,
-								struct sk_buff *skb)
+					struct sk_buff *skb)
 {
 	struct wtun_hw *hw = (struct wtun_hw *)phw->priv;
 	struct ieee80211_tx_info *tx_info = NULL;
@@ -329,8 +326,8 @@ static void xmit_skb_dev(struct ieee80211_hw *phw,
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,7,0))
 static void transmit_wtun_dev(struct ieee80211_hw *hw,
-							  struct ieee80211_tx_control *control,
-                              struct sk_buff *skb)
+					struct ieee80211_tx_control *control,
+					struct sk_buff *skb)
 {
 	xmit_skb_dev(hw, skb);
 }
@@ -342,9 +339,9 @@ static void transmit_wtun_dev(struct ieee80211_hw *hw, struct sk_buff *skb)
 #endif
 
 static int conf_tx_wtun_dev(struct ieee80211_hw *hw,
-							struct ieee80211_vif *vif,
-							u16 queue,
-							const struct ieee80211_tx_queue_params *param)
+					struct ieee80211_vif *vif,
+					u16 queue,
+					const struct ieee80211_tx_queue_params *param)
 {
 	struct wtun_hw *whw = NULL;
 	pr_info("%s\n", __func__);
@@ -388,11 +385,11 @@ int create_wtun_dev(void)
 	sprintf(whw->dev_name, "wtun-mac80211");
 	/* This is a GPL exported only function. */
    	whw->dev = device_create(whw->class,
-									NULL,
-                	                0,
-                        	        whw->hw,
-                                  	whw->dev_name,
-                                	0);	
+					NULL,
+					0,
+					whw->hw,
+					whw->dev_name,
+					0);
 
 	if (IS_ERR(whw->dev)) {
 		ret = PTR_ERR(whw->dev);
@@ -414,30 +411,30 @@ int create_wtun_dev(void)
 	skb_queue_head_init(&whw->head_skb);
 
 	/* Specify the supported driver name. */
-    whw->dev->driver = &wtun_dev_driver;
-    SET_IEEE80211_DEV(whw->hw, whw->dev);
+	whw->dev->driver = &wtun_dev_driver;
+	SET_IEEE80211_DEV(whw->hw, whw->dev);
 
 	/* generate mac address */
-    random_ether_addr((u8 *)&whw->maddr);
-    whw->hw->wiphy->addresses = &whw->maddr;
+	random_ether_addr((u8 *)&whw->maddr);
+	whw->hw->wiphy->addresses = &whw->maddr;
 
 	/* setup hardware data */
-    whw->hw->channel_change_time = 1;
-    whw->hw->queues = 4;
-    whw->hw->wiphy->n_addresses = 1;
+	whw->hw->channel_change_time = 1;
+	whw->hw->queues = 4;
+	whw->hw->wiphy->n_addresses = 1;
 
 	whw->hw->wiphy->interface_modes = BIT(NL80211_IFTYPE_MESH_POINT) |
-      								       BIT(NL80211_IFTYPE_ADHOC) |
-      									   BIT(NL80211_IFTYPE_AP) |
-      									   BIT(NL80211_IFTYPE_P2P_CLIENT) |
-      									   BIT(NL80211_IFTYPE_P2P_GO) |
-      									   BIT(NL80211_IFTYPE_STATION);
+						BIT(NL80211_IFTYPE_ADHOC) |
+						BIT(NL80211_IFTYPE_AP) |
+						BIT(NL80211_IFTYPE_P2P_CLIENT) |
+						BIT(NL80211_IFTYPE_P2P_GO) |
+						BIT(NL80211_IFTYPE_STATION);
 
    	whw->hw->flags = IEEE80211_HW_MFP_CAPABLE |
 						IEEE80211_HW_SIGNAL_DBM |
-      					IEEE80211_HW_SUPPORTS_STATIC_SMPS |
-      					IEEE80211_HW_SUPPORTS_DYNAMIC_SMPS |
-      					IEEE80211_HW_AMPDU_AGGREGATION;
+						IEEE80211_HW_SUPPORTS_STATIC_SMPS |
+						IEEE80211_HW_SUPPORTS_DYNAMIC_SMPS |
+						IEEE80211_HW_AMPDU_AGGREGATION;
 
 	whw->hw->sta_data_size = sizeof(struct station_data);	
 	whw->hw->vif_data_size = sizeof(struct vint_data);	
@@ -450,11 +447,11 @@ int create_wtun_dev(void)
    	whw->band.bitrates = whw->rate;
    	whw->band.n_bitrates = RATE_SIZE;
    	whw->band.ht_cap.ht_supported = true;
-   	whw->band.ht_cap.cap = 
-			IEEE80211_HT_CAP_SUP_WIDTH_20_40 |
-      		IEEE80211_HT_CAP_GRN_FLD |
-      		IEEE80211_HT_CAP_SGI_40 |
-      		IEEE80211_HT_CAP_DSSSCCK40;
+	whw->band.ht_cap.cap = IEEE80211_HT_CAP_SUP_WIDTH_20_40 |
+						IEEE80211_HT_CAP_GRN_FLD |
+						IEEE80211_HT_CAP_SGI_40 |
+						IEEE80211_HT_CAP_DSSSCCK40;
+
    	whw->band.ht_cap.ampdu_factor = 0x3;
    	whw->band.ht_cap.ampdu_density = 0x6;
    	memset(&whw->band.ht_cap.mcs, 0, sizeof(whw->band.ht_cap.mcs));
