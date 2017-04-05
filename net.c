@@ -1,10 +1,10 @@
 #include "wtun.h"
 #include "net.h"
 
-static void encap_tunnel_udp_header(struct sk_buff* skb, 
-									int udplen, 
-									u32 srcip, 
-									u32 dstip)
+static void encap_tunnel_udp_header(struct sk_buff* skb,
+						int udplen,
+						u32 srcip,
+						u32 dstip)
 {
 	struct udphdr* udph = NULL;
 
@@ -17,9 +17,9 @@ static void encap_tunnel_udp_header(struct sk_buff* skb,
    	udph->len = htons(udplen);
 
    	udph->check = 0;
-   	udph->check = csum_tcpudp_magic(srcip, dstip, udplen, 
-									IPPROTO_UDP, 
-									csum_partial(udph, udplen, 0));
+	udph->check = csum_tcpudp_magic(srcip, dstip, udplen,
+						IPPROTO_UDP,
+						csum_partial(udph, udplen, 0));
 }
 
 static void encap_tunnel_ip_header(struct sk_buff* skb, 
@@ -49,9 +49,9 @@ static void encap_tunnel_ip_header(struct sk_buff* skb,
    	iph->check = ip_fast_csum((unsigned char*)iph, iph->ihl);
 }
 
-static void encap_tunnel_eth_header(struct sk_buff* skb, 
-									u8* srcmac, 
-									u8* dstmac)
+static void encap_tunnel_eth_header(struct sk_buff* skb,
+						u8* srcmac,
+						u8* dstmac)
 {
    	struct ethhdr* eth = (struct ethhdr*)skb_push(skb, ETH_HLEN);
    	skb_reset_mac_header(skb);
@@ -67,7 +67,7 @@ static struct rtable* find_routing_table(u32 dstip)
    	struct rtable* rtbl = NULL;
    	rtbl = ip_route_output_key(&init_net, &fl4);
 
-    return (rtbl && !IS_ERR(rtbl)) ? rtbl : NULL;
+	return (rtbl && !IS_ERR(rtbl)) ? rtbl : NULL;
 }
 
 static u32 find_source_ip(struct rtable* rtbl)
@@ -76,17 +76,16 @@ static u32 find_source_ip(struct rtable* rtbl)
    	return indev->ifa_list->ifa_local;
 }
 
-static void get_destination_mac(u32 dstip, 
-								struct rtable* rtbl, 
-								u8* dstmac)
+static void get_destination_mac(u32 dstip,
+				struct rtable* rtbl,
+				u8* dstmac)
 {
    	extern struct neigh_table arp_tbl;
    	struct neighbour* neigh = neigh_lookup(&arp_tbl, &dstip, rtbl->dst.dev);
-   	if (!neigh || IS_ERR(neigh)) {
-       	memset(dstmac, 0xff, ETH_ALEN);
-   	} else {
-       	memcpy(dstmac, neigh->ha, ETH_ALEN);
-   	}
+	if (!neigh || IS_ERR(neigh))
+		memset(dstmac, 0xff, ETH_ALEN);
+	else
+		memcpy(dstmac, neigh->ha, ETH_ALEN);
 }
 
 static int encap_tunnel_skb(struct sk_buff* skb)
@@ -102,12 +101,12 @@ static int encap_tunnel_skb(struct sk_buff* skb)
    	iplen = udplen + sizeof(struct iphdr);
 
    	ret = u_inet_pton(AF_INET, dst_addr, &dstip);
-	if (ret < 0)  
-    	goto error;
+	if (ret < 0)
+		goto error;
 
    	rtbl = find_routing_table(dstip);
-	if (NULL == rtbl)  
-       	goto error;
+	if (NULL == rtbl)
+		goto error;
 
    	srcip = find_source_ip(rtbl);
    	memcpy(&srcmac, rtbl->dst.dev->dev_addr, ETH_ALEN);
@@ -160,16 +159,16 @@ void send_by_tunnel(struct sk_buff *skb)
    	int ret;
 
    	newskb = skb_realloc_headroom(skb, headroom);
-	if (NULL == newskb)  
-       	goto error;
+	if (NULL == newskb)
+		goto error;
 
    	ret = encap_tunnel_skb(newskb);
-	if (ret < 0)  
-       	goto error;
+	if (ret < 0)
+		goto error;
 
    	ret = dev_queue_xmit(newskb);
-	if (ret < 0)  
-       	goto error;
+	if (ret < 0)
+		goto error;
 
    	return;
 
