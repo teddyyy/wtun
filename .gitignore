@@ -1,0 +1,7 @@
+.tmp_versions/
+modules.order
+Module.symvers
+*.cmd
+wtun.mod.c
+*.o
+*.ko
