@@ -126,8 +126,9 @@ static int config_wtun_dev(struct ieee80211_hw *phw, u32 changed)
 			hw->idle = !!(phw->conf.flags & IEEE80211_CONF_IDLE);
 		else 
 			pr_info("error hw (%p)\n", hw);
-	} else 
+	} else {
 		pr_info("error phw (%p) changed (%d)\n", phw, changed);
+	}
 	
   	return 0;
 }
@@ -249,8 +250,9 @@ static int skb_polling(void *p)
 			if (skb_queue_len(&phw->head_skb) > 0) 
 				ret = 1;
 			spin_unlock_irqrestore(&phw->pspin, flags);
-		} else 
+		} else {
 			ret = -1;
+		}
 	}
 	
 	return ret;
@@ -267,20 +269,21 @@ static int transmit_thread(void *p)
 	ctime = jiffies + phw->ubeacons;
 	while ((!kthread_should_stop()) && (phw->active)) {
 		wait_event_interruptible_timeout(phw->plist, 
-										((uqos = skb_polling(phw)) > 0),
-										whw->ubeacons);
+						((uqos = skb_polling(phw)) > 0),
+						whw->ubeacons);
+
 		if ((phw->active) && (!phw->idle)) {
 			if (phw->radio_active) {
 				if (jiffies > ctime) {
 					#if (LINUX_VERSION_CODE < KERNEL_VERSION(3,11,0))
 					ieee80211_iterate_active_interfaces_atomic(phw->hw,
-											transmit_beacon,
-											phw->hw);
+										transmit_beacon,
+										phw->hw);
 					#else  
 					ieee80211_iterate_active_interfaces_atomic(phw->hw,
-											IEEE80211_IFACE_ITER_NORMAL,
-											transmit_beacon,
-											phw->hw);
+										IEEE80211_IFACE_ITER_NORMAL,
+										transmit_beacon,
+										phw->hw);
 					#endif
 					ctime = jiffies + phw->ubeacons;
 					phw->ubeacons_count++;		
