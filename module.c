@@ -13,7 +13,8 @@ int destroy_wtun_dev(void);
 int create_netfilter_hook(void);
 int destroy_netfilter_hook(void);
 
-static int __init wtun_init(void)
+static int
+__init wtun_init(void)
 {
 	int ret;
 
@@ -39,7 +40,8 @@ static int __init wtun_init(void)
 	return 0;
 }
 
-static void __exit wtun_exit(void)
+static void
+__exit wtun_exit(void)
 {
 	destroy_netfilter_hook();
 	destroy_wtun_dev();
