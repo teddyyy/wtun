@@ -1,4 +1,4 @@
-obj-m	:= wtun.o
+obj-m		:= wtun.o
 wtun-objs	:= module.o dev.o net.o filter.o
 
 KDIR	:= /lib/modules/$(shell uname -r)/build/

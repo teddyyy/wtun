@@ -12,7 +12,8 @@ int create_wtun_dev(void);
 int destroy_wtun_dev(void);
 struct wtun_hw* get_wtun_dev(void);
 
-static struct ieee80211_channel wtun_channel[] = {
+static
+struct ieee80211_channel wtun_channel[] = {
 	{
 		.band = IEEE80211_BAND_2GHZ,
 		.center_freq = 2412,
@@ -33,7 +34,8 @@ static struct ieee80211_channel wtun_channel[] = {
 	},
 };
 
-static const struct ieee80211_rate wtun_rate[] = {
+static
+const struct ieee80211_rate wtun_rate[] = {
 	{ .bitrate = 10,  .flags = 0 },
 	{ .bitrate = 20,  .flags = IEEE80211_RATE_SHORT_PREAMBLE },
 	{ .bitrate = 55,  .flags = IEEE80211_RATE_SHORT_PREAMBLE },
@@ -65,15 +67,14 @@ struct wtun_hw {
 
 	bool active;
 	bool radio_active;
-	
-	struct ieee80211_supported_band band;		
+
+	struct ieee80211_supported_band band;
 	struct ieee80211_channel channel[CHANNEL_SIZE];
 	struct ieee80211_rate rate[RATE_SIZE];
-	
+
 	char pname[64];
 	void *pth;
 	spinlock_t pspin;
 	wait_queue_head_t plist;
 	struct sk_buff_head head_skb;
 };
-

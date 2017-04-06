@@ -15,13 +15,14 @@ extern char *dst_addr;
 extern int dst_port;
 extern int src_port;
 
-static inline int u_inet_pton(int af, const char *src, void *dst)
+static inline int
+u_inet_pton(int af, const char *src, void *dst)
 {
-    if (AF_INET == af) 
+    if (AF_INET == af)
         return in4_pton(src, strlen(src), (u8*)dst, '\0', NULL);
-    else if (AF_INET6 == af) 
+    else if (AF_INET6 == af)
         return in6_pton(src, strlen(src), (u8*)dst, '\0', NULL);
-    else 
+    else
         return -1;
 }
 

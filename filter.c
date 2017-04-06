@@ -4,7 +4,8 @@
 
 static struct nf_hook_ops wtun_hook = {};
 
-static bool is_tunnel_data(struct sk_buff *skb)
+static bool
+is_tunnel_data(struct sk_buff *skb)
 {
 	struct iphdr *iph = (struct iphdr*)skb_network_header(skb);
 	struct udphdr *udph;
@@ -18,7 +19,8 @@ static bool is_tunnel_data(struct sk_buff *skb)
 	if (!iph)
 		return false;
 
-	skb->transport_header = skb->network_header + (iph->ihl * 4);
+	skb->transport_header = skb->network_header
+				+ (iph->ihl * 4);
 
 	if (iph->saddr == srcip) {
 		if (iph->protocol == IPPROTO_UDP) {
@@ -35,11 +37,12 @@ static bool is_tunnel_data(struct sk_buff *skb)
 }
 
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(3,13,0))
-static unsigned int wtun_hook_funk(unsigned int hooknum,
-						struct sk_buff *skb,
-						const struct net_device *in,
-						const struct net_device *out,
-						int (*okfn)(struct sk_buff*))
+static unsigned int
+wtun_hook_funk(unsigned int hooknum,
+			struct sk_buff *skb,
+			const struct net_device *in,
+			const struct net_device *out,
+			int (*okfn)(struct sk_buff*))
 {
 	if (is_tunnel_data(skb)) {
 		int iphlen, rest_wtun_header_len;
@@ -55,12 +58,14 @@ static unsigned int wtun_hook_funk(unsigned int hooknum,
 			skb_pull(skb, rest_wtun_header_len);
 			if (NULL != skb) {
 				memset(&stat, 0, sizeof(stat));
-			
+
 				stat.band = (u32)whw->hw->conf.channel->band;
-				stat.freq = (u32)whw->hw->conf.channel->center_freq;	
-				stat.signal = (u32)whw->hw->conf.power_level;	
+				stat.freq = (u32)whw->hw->	\
+						conf.channel->center_freq;
+				stat.signal = (u32)whw->hw->conf.power_level;
 				stat.rate_idx = 1;
-				memcpy(IEEE80211_SKB_RXCB(skb), &stat, sizeof(stat));
+				memcpy(IEEE80211_SKB_RXCB(skb), &stat,
+							sizeof(stat));
 
 				if ((whw->radio_active) && (whw->active)) {
 					ieee80211_rx(whw->hw, skb);
@@ -73,12 +78,13 @@ static unsigned int wtun_hook_funk(unsigned int hooknum,
 	return NF_ACCEPT;
 }
 
-#else 
-static unsigned int wtun_hook_funk(const struct nf_hook_ops *ops,
-						struct sk_buff *skb,
-						const struct net_device *in,
-						const struct net_device *out,
-						int (*okfn)(struct sk_buff*))
+#else
+static unsigned int
+wtun_hook_funk(const struct nf_hook_ops *ops,
+			struct sk_buff *skb,
+			const struct net_device *in,
+			const struct net_device *out,
+			int (*okfn)(struct sk_buff*))
 {
 	if (is_tunnel_data(skb)) {
 		int iphlen, rest_wtun_header_len;
@@ -104,7 +110,8 @@ static unsigned int wtun_hook_funk(const struct nf_hook_ops *ops,
 }
 #endif
 
-int create_netfilter_hook(void)
+int
+create_netfilter_hook(void)
 {
 	pr_info("%s\n", __func__);
 
@@ -116,7 +123,8 @@ int create_netfilter_hook(void)
 	return nf_register_hook(&wtun_hook);
 }
 
-int destroy_netfilter_hook(void)
+int
+destroy_netfilter_hook(void)
 {
 	pr_info("%s\n", __func__);
 
